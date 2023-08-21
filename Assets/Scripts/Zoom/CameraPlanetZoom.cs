@@ -1,7 +1,26 @@
-﻿namespace WorldBuilder.Client.Zoom
+﻿using JetBrains.Annotations;
+using UnityEngine;
+using UnityEngine.iOS;
+
+namespace WorldBuilder.Client.Zoom
 {
-    public class CameraPlanetZoom
+    public static class CameraPlanetZoom
     {
+        public static float EdgeDistanceFrom(this Transform planetTransform, Transform otherTransform)
+        {
+            var otherPosition = otherTransform.position;
+            var planetPosition = planetTransform.position;
+            var planetRadius = planetTransform.localScale.x / 2f;
+    
+            var distanceFromPlanetCenter = (otherPosition - planetPosition).magnitude;
+            return distanceFromPlanetCenter - planetRadius;
+        }
         
+        public static float EdgeDistanceFromCamera(this Transform planetTransform, [CanBeNull] Camera camera)
+        {
+            Debug.Assert(camera != null);
+            
+            return planetTransform.EdgeDistanceFrom(camera.transform);
+        }
     }
 }
