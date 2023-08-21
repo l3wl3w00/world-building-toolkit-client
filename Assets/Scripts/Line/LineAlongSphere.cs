@@ -13,11 +13,7 @@ namespace LineUtils
     
         public LineAlongSphere(LineRenderer lineRenderer, Transform gameObjectTransform)
         {
-            lineRenderer.startColor = new Color(200, 200, 0);
-            lineRenderer.endColor = lineRenderer.startColor;
-            lineRenderer.endWidth = 0.3f;
-            lineRenderer.startWidth = lineRenderer.endWidth;
-            _dynamicLineRenderer = new DynamicLineRenderer(lineRenderer, Resolution);
+            _dynamicLineRenderer = new DynamicLineRenderer(lineRenderer);
             _gameObjectTransform = gameObjectTransform;
         }
     

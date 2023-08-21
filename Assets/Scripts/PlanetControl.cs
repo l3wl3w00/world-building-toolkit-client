@@ -1,25 +1,38 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using LineUtils;
 using UnityEngine;
+using WorldBuilder.Client.Line;
+using WorldBuilder.Client.Zoom;
 
 public class PlanetControl : MonoBehaviour
 {
     private const float Speed = 10.0f;
     private Vector3 _lastMousePosition;
     private LineAlongSphere _line;
-    
+    private LineRenderer _lineRenderer;
+
     public float Radius { get; set; }
 
     private void Start()
     {
-        _line = new LineAlongSphere(GetComponent<LineRenderer>(), transform);
-
+        var selfTransform = transform;
+        _line = new LineAlongSphere(GetComponent<LineRenderer>(), selfTransform);
+        _lineRenderer = GetComponent<LineRenderer>();
     }
 
     private void Update()
     {
+        var mainCamera = Camera.main;
+        if (mainCamera == null)
+        {
+            Debug.Log("Main camera is null");
+            return;
+        }
+
+        var cameraPlanetEdgeDistance = CameraPlanetZoom.GetCameraPlanetEdgeDistance(transform, mainCamera.transform);
+        _lineRenderer.endWidth = cameraPlanetEdgeDistance * 0.02f;
+        _lineRenderer.startWidth = cameraPlanetEdgeDistance * 0.02f;
         if (Input.GetMouseButtonDown(0))
         {
             // When the mouse is clicked, record the position
@@ -34,8 +47,6 @@ public class PlanetControl : MonoBehaviour
             var axis = new Vector3(-delta.y, delta.x, 0);
             transform.Rotate(axis * (Speed * Time.deltaTime), Space.World);
         }
-
-        
     }
 
     private void OnMouseDown()
