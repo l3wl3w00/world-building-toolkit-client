@@ -26,9 +26,9 @@ namespace SphereGenerator{
 			component.hardEdges = EditorGUILayout.Toggle ("Hard Edges", component.hardEdges);
 			component.radius = EditorGUILayout.FloatField ("Radius", component.radius);
 			if (!component.hardEdges) {
-				component.subdivision = EditorGUILayout.IntSlider ("Subdivisions", component.subdivision, 0, 6);
+				component.subdivision = EditorGUILayout.IntSlider ("Subdivisions", component.subdivision, 0, 7);
 			} else {
-				component.subdivision = EditorGUILayout.IntSlider ("Subdivisions", component.subdivision, 0, 5);
+				component.subdivision = EditorGUILayout.IntSlider ("Subdivisions", component.subdivision, 0, 7);
 			}
 			GUILayout.Label (" ", EditorStyles.boldLabel);
 			GUILayout.Label ("Save mesh in assets folder", EditorStyles.boldLabel);
@@ -77,6 +77,7 @@ namespace SphereGenerator{
 
 		public Mesh generateMesh(int subdivision = 0, float radius = 1.0f, bool hardEdges = false){
 			Mesh sphere = new Mesh ();
+			sphere.indexFormat = UnityEngine.Rendering.IndexFormat.UInt32;
 			if (subdivision < 0) {
 				//fail
 				Debug.Log("[IcoSphere] generateMesh(): Subdivision has to be at least 0");

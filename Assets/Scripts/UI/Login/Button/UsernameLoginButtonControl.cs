@@ -1,12 +1,13 @@
-using WorldBuilder.Client.UI.Common.Button;
+using System;
+using UI.Common.Button;
 
-namespace WorldBuilder.Client.UI.Login.Button
+namespace UI.Login.Button
 {
-    public class UsernameLoginButtonControl : ButtonControl
+    public class UsernameLoginButtonControl : ButtonControl<NoButtonParams>
     {
-        public override void OnClicked()
+        protected override void OnClickedTypesafe(NoButtonParams param)
         {
-            throw new System.NotImplementedException();
+            throw new NotImplementedException();
         }
     }
 }

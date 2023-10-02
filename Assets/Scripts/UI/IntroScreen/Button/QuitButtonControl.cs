@@ -1,13 +1,14 @@
-using WorldBuilder.Client.UI.Common.Button;
+using UI.Common.Button;
+using UnityEditor;
 
-namespace WorldBuilder.Client.UI.IntroScreen.Button
+namespace UI.IntroScreen.Button
 {
-    public class QuitButtonControl : ButtonControl
+    public class QuitButtonControl : ButtonControl<NoButtonParams>
     {
-        public override void OnClicked()
+        protected override void OnClickedTypesafe(NoButtonParams param)
         {
 #if UNITY_EDITOR
-            UnityEditor.EditorApplication.isPlaying = false;
+            EditorApplication.isPlaying = false;
 #else
             Application.Quit();
 #endif

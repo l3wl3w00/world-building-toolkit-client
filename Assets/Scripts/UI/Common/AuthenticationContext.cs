@@ -1,16 +1,12 @@
-using System;
-
-namespace WorldBuilder.Client.UI.Common
+namespace UI.Common
 {
     public class AuthenticationContext
     {
-        private readonly String authToken;
-
-        public string AuthToken => authToken;
+        public string AuthToken { get; }
 
         public AuthenticationContext(string authToken)
         {
-            this.authToken = authToken;
+            AuthToken = authToken;
         }
     }
 }

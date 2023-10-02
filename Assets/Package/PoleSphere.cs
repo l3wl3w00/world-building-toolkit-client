@@ -25,8 +25,8 @@ namespace SphereGenerator{
 			GUILayout.Label ("Pole Sphere Properties", EditorStyles.boldLabel);
 			component.hardEdges = EditorGUILayout.Toggle("Hard Edges", component.hardEdges);
 			component.radius = EditorGUILayout.FloatField("Radius", component.radius);
-			component.segments = EditorGUILayout.IntSlider("Segments", component.segments, 3, 100);
-			component.rings = EditorGUILayout.IntSlider("Rings", component.rings, 1, 100);
+			component.segments = EditorGUILayout.IntSlider("Segments", component.segments, 3, 200);
+			component.rings = EditorGUILayout.IntSlider("Rings", component.rings, 1, 200);
 			GUILayout.Label (" ", EditorStyles.miniLabel);
 
 			GUILayout.Label ("Save mesh in assets folder", EditorStyles.boldLabel);
@@ -73,6 +73,7 @@ namespace SphereGenerator{
 
 		public Mesh generateMesh(int segments = 3, int rings = 1, float radius = 1.0f, bool hardEdges = false){
 			Mesh sphere = new Mesh ();
+			sphere.indexFormat = UnityEngine.Rendering.IndexFormat.UInt32;
 			if (segments < 3) {
 				//fail
 				Debug.Log ("[PoleSphere] generateMesh(): There need to be at least 3 segments. Your Input was " + segments);

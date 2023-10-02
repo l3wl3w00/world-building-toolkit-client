@@ -1,12 +1,13 @@
-using WorldBuilder.Client.UI.Common.Button;
+using System;
+using UI.Common.Button;
 
-namespace WorldBuilder.Client.UI.IntroScreen.Button
+namespace UI.IntroScreen.Button
 {
-    public class RegisterButtonControl : ButtonControl
+    public class RegisterButtonControl : ButtonControl<NoButtonParams>
     {
-        public override void OnClicked()
+        protected override void OnClickedTypesafe(NoButtonParams param)
         {
-            throw new System.NotImplementedException();
+            throw new NotImplementedException();
         }
     }
 }

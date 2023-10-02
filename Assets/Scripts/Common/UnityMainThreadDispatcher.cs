@@ -1,13 +1,16 @@
+#nullable enable
 using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace WorldBuilder.Client.Common
+namespace Common
 {
     public class UnityMainThreadDispatcher : MonoBehaviour
     {
         private static UnityMainThreadDispatcher _instance;
-        private readonly Queue<Action> actionQueue = new Queue<Action>();
+        private readonly Queue<Action> actionQueue = new();
+
+        #region Properties
 
         public static UnityMainThreadDispatcher Instance
         {
@@ -15,24 +18,28 @@ namespace WorldBuilder.Client.Common
             {
                 if (_instance == null)
                 {
-                    GameObject go = new GameObject("UnityMainThreadDispatcher");
+                    var go = new GameObject("UnityMainThreadDispatcher");
                     DontDestroyOnLoad(go);
                     _instance = go.AddComponent<UnityMainThreadDispatcher>();
                 }
+
                 return _instance;
             }
         }
 
-        void Update()
+        #endregion
+
+        #region Event Functions
+
+        private void Update()
         {
             lock (actionQueue)
             {
-                while (actionQueue.Count > 0)
-                {
-                    actionQueue.Dequeue().Invoke();
-                }
+                while (actionQueue.Count > 0) actionQueue.Dequeue().Invoke();
             }
         }
+
+        #endregion
 
         public void Enqueue(Action action)
         {

@@ -1,28 +1,41 @@
 using System;
-using System.Threading.Tasks;
-using UnityEngine;
 using System.Net;
-using UnityEngine.SceneManagement;
-using WorldBuilder.Client.Common;
+using System.Threading.Tasks;
+using Common;
+using Game.Constants;
+using Generated;
+using UnityEngine;
 
-namespace WorldBuilder.Client.UI.OAuth
+namespace UI.OAuth
 {
     public class OAuthCallbackListener : MonoBehaviour
     {
+        private readonly ITimeProvider _timeProvider = new SystemTimeProvider();
+        private UnityMainThreadDispatcher _unityMainThreadDispatcher;
         private HttpListener listener;
         private Task listenerTask;
-        private UnityMainThreadDispatcher _unityMainThreadDispatcher;
-        void Start()
+
+        #region Event Functions
+
+        private void Start()
         {
             _unityMainThreadDispatcher = UnityMainThreadDispatcher.Instance;
             StartServer();
-            listenerTask = Task.Run(CheckForRequests);  // Start only one task
+            listenerTask = Task.Run(CheckForRequests); // Start only one task
         }
 
-        void Update()
+        private void Update()
         {
             // Handle main-thread-only tasks if necessary
         }
+
+        private void OnDestroy()
+        {
+            // Stop the listener when the GameObject is destroyed
+            if (listener is { IsListening: true }) listener.Stop();
+        }
+
+        #endregion
 
         private void StartServer()
         {
@@ -37,23 +50,25 @@ namespace WorldBuilder.Client.UI.OAuth
             {
                 while (listener.IsListening)
                 {
-                    HttpListenerContext context = await listener.GetContextAsync();
-                    HttpListenerRequest request = context.Request;
+                    var context = await listener.GetContextAsync();
+                    var request = context.Request;
 
                     // Read the OAuth code or token from the request
-                    string token = request.QueryString["token"];
+                    var token = request.QueryString["token"];
+                    var expiration = int.Parse(request.QueryString["expires"]);
                     listener.Stop();
                     if (!string.IsNullOrEmpty(token))
-                    {
                         // Handle token
                         // Dispatch this back to Unity main thread if needed
                         _unityMainThreadDispatcher.Enqueue(() =>
                         {
-                            PlayerPrefs.SetString("google-token", token);
+                            PlayerPrefs.SetString(AuthConstants.GoogleTokenKey, token);
+                            PlayerPrefs.SetInt(AuthConstants.GoogleTokenExpirationKey, expiration);
+                            PlayerPrefs.SetString(AuthConstants.GoogleTokenSaveDateKey,
+                                _timeProvider.Now.ToBinary().ToString());
                             PlayerPrefs.Save();
-                            SceneManager.LoadScene(SceneNames.WorldListScreen);
+                            Scenes.MainMenuScreen.Load();
                         });
-                    }
                 }
             }
             catch (Exception e)
@@ -62,15 +77,6 @@ namespace WorldBuilder.Client.UI.OAuth
                 Debug.LogError("An error occurred: " + e.Message);
             }
             finally
-            {
-                listener.Stop();
-            }
-        }
-
-        void OnDestroy()
-        {
-            // Stop the listener when the GameObject is destroyed
-            if (listener is { IsListening: true })
             {
                 listener.Stop();
             }

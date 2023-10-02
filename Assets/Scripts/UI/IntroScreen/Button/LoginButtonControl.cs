@@ -1,13 +1,14 @@
-using UnityEngine.SceneManagement;
-using WorldBuilder.Client.UI.Common.Button;
+using Common;
+using Generated;
+using UI.Common.Button;
 
-namespace WorldBuilder.Client.UI.IntroScreen.Button
+namespace UI.IntroScreen.Button
 {
-    public class LoginButtonControl : ButtonControl
+    public class LoginButtonControl : ButtonControl<NoButtonParams>
     {
-        public override void OnClicked()
+        protected override void OnClickedTypesafe(NoButtonParams param)
         {
-            SceneManager.LoadScene(SceneNames.LoginScreen);
+            Scenes.LoginScreen.Load();
         }
     }
 }

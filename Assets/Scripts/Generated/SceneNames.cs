@@ -1,9 +1,20 @@
-public static class SceneNames
+namespace Generated
 {
-    public const string IntroScreen = "IntroScreen";
-    public const string LoginScreen = "LoginScreen";
-    public const string OAuthLoginScreen = "OAuthLoginScreen";
-    public const string MainMenuScreen = "MainMenuScreen";
-    public const string PlanetEditingScene = "PlanetEditingScene";
-    public const string WorldListScreen = "WorldListScreen";
+    public class Scenes
+    {
+        public string Name { get; }
+        public static Scenes UnauthorizedScreen => new("UnauthorizedScreen");
+        public static Scenes LoginScreen => new("LoginScreen");
+        public static Scenes OAuthLoginScreen => new("OAuthLoginScreen");
+        public static Scenes MainMenuScreen => new("MainMenuScreen");
+        public static Scenes PlanetEditingScene => new("PlanetEditingScene");
+        public static Scenes WorldListScreen => new("WorldListScreen");
+        public static Scenes PlanetEditingLoadScene => new("PlanetEditingLoadScene");
+        public static Scenes Initial => new("Initial");
+
+        private Scenes(string name)
+        {
+            Name = name;
+        }
+    }
 }

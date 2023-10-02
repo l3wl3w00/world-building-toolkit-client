@@ -1,36 +1,37 @@
-using System.Collections;
-using System.Collections.Generic;
-using System.Net.Http;
-using System.Threading.Tasks;
-using TMPro;
-using UnityEditor;
+using System;
+using Game.Client;
+using Game.Client.Dto;
+using Game.Constants;
 using UnityEngine;
-using UnityEngine.Networking;
-using UnityEngine.SceneManagement;
-using UnityEngine.UI;
-using WorldBuilder.Client.Game.Common.Client;
 
-namespace WorldBuilder.Client.UI.WorldList
+namespace UI.WorldList
 {
     public class WorldLoader : MonoBehaviour
     {
-        private readonly string apiEndpoint = "https://localhost:44366/planet";
-        private WorldBuildingApiClient client;
-        public GameObject itemPrefab;  // Prefab for UI elements
-        public Canvas canvas;   
+        #region Serialized Fields
 
-        void Start()
+        [SerializeField] private Transform contentTransform;
+        public GameObject itemPrefab; // Prefab for UI elements
+        public Canvas canvas;
+
+        #endregion
+
+        private WorldBuildingApiClient _client;
+
+        #region Event Functions
+
+        private void Start()
         {
-            client = new WorldBuildingApiClient(PlayerPrefs.GetString("google-token"));
-            StartCoroutine(client.GetWorlds(CreateItemUI));
+            _client = new WorldBuildingApiClient(PlayerPrefs.GetString(AuthConstants.GoogleTokenKey));
+            StartCoroutine(_client.GetWorlds(CreateItemUI));
         }
 
-        void CreateItemUI(WorldSummaryDto world)
+        #endregion
+
+        private void CreateItemUI(WorldSummaryDto world)
         {
-            var newItem = Instantiate(itemPrefab, canvas.transform);
-            var button = newItem.GetComponent<Button>();
-            var text = button.GetComponentInChildren<TextMeshProUGUI>();
-            text.text = world.name;
+            var initializer = Instantiate(itemPrefab, contentTransform).GetComponent<WorldUiItemInitializer>();
+            initializer.Initialize(world.name, Guid.Parse(world.id));
         }
     }
 }
