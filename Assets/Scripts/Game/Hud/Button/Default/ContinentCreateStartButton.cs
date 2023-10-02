@@ -1,4 +1,5 @@
-﻿using Game.Continent;
+#nullable enable
+using Game.Continent;
 using UI.Common.Button;
 
 namespace Game.Hud.Button.Default

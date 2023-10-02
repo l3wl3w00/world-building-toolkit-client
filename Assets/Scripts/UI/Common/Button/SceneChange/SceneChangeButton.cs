@@ -1,4 +1,5 @@
-﻿using Common;
+#nullable enable
+using Common;
 using Game.SceneChange;
 using Generated;
 

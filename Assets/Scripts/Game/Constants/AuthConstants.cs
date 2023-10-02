@@ -1,4 +1,5 @@
-﻿namespace Game.Constants
+#nullable enable
+namespace Game.Constants
 {
     public static class AuthConstants
     {

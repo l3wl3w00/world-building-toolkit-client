@@ -1,4 +1,5 @@
-﻿using Game.Client;
+#nullable enable
+using Game.Client;
 using Game.Client.Dto;
 using Game.Constants;
 using Game.Continent;

@@ -1,3 +1,4 @@
+#nullable enable
 using Common;
 using Generated;
 using UI.Common.Button;

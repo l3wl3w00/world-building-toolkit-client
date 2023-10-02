@@ -1,4 +1,5 @@
-﻿using Game.Client;
+#nullable enable
+using Game.Client;
 using Game.Constants;
 using UI.Common.Button;
 using UnityEngine;

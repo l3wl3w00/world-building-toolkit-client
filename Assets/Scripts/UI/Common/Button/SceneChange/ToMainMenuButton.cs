@@ -1,4 +1,5 @@
-﻿using Generated;
+#nullable enable
+using Generated;
 
 namespace UI.Common.Button.SceneChange
 {

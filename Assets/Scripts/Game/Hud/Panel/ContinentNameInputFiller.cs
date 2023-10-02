@@ -1,3 +1,4 @@
+#nullable enable
 using Game.Util;
 
 namespace Game.Hud.Panel

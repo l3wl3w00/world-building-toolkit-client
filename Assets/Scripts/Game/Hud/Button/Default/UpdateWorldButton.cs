@@ -1,4 +1,5 @@
-﻿using System.Linq;
+#nullable enable
+using System.Linq;
 using Game.Client;
 using Game.Client.Dto;
 using Game.Constants;

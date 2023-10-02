@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using Game.Client;
 using Game.Client.Dto;

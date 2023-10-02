@@ -1,31 +1,25 @@
 ﻿using System.IO;
 using UnityEditor;
+using UnityEngine;
+
 namespace WorldBuilder.Client.Editor
 {
-    [InitializeOnLoad]
-    public class NullableEnabler
+    public static class NullableEnabler
     {
-        static NullableEnabler()
+        [MenuItem("Tools/Add #nullable enable to Scripts")]
+        public static void AddNullableToScripts()
         {
-            var watcher = new FileSystemWatcher
+            var files = Directory.GetFiles("Assets/Scripts", "*.cs", SearchOption.AllDirectories);
+            foreach (var file in files)
             {
-                Path = "Assets/",
-                Filter = "*.cs"
-            };
-
-            watcher.Created += OnCreated;
-            watcher.EnableRaisingEvents = true;
-        }
-
-        private static void OnCreated(object source, FileSystemEventArgs e)
-        {
-            // WARNING: This is a very naive implementation. You should add more checks here.
-            string content = File.ReadAllText(e.FullPath);
-            if (!content.StartsWith("#nullable enable"))
-            {
-                content = "#nullable enable\n" + content;
-                File.WriteAllText(e.FullPath, content);
+                var content = File.ReadAllText(file);
+                if (content.StartsWith("#nullable enable")) continue;
+                
+                content = "#nullable enable\n" + content; 
+                File.WriteAllText(file, content);
             }
+
+            Debug.Log("Added #nullable enable to scripts.");
         }
     }
 }

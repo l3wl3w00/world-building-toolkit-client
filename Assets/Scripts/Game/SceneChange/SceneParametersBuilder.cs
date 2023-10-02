@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+#nullable enable
+using System.Collections.Generic;
 using Game.Linq;
 using Game.Util;
 using Generated;

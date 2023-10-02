@@ -1,3 +1,4 @@
+#nullable enable
 namespace UI.Common
 {
     public class AuthenticationContext

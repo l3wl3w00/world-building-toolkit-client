@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+#nullable enable
+using UnityEngine;
 
 namespace Game.Geometry.Coordinate._2D
 {

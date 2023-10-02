@@ -1,4 +1,5 @@
-﻿using System;
+#nullable enable
+using System;
 using Common;
 using Game.Client;
 using Game.Constants;

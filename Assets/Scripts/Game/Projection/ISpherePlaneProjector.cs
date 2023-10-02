@@ -1,4 +1,5 @@
-﻿using Game.Geometry.Coordinate._2D;
+#nullable enable
+using Game.Geometry.Coordinate._2D;
 using Game.Geometry.Sphere;
 using UnityEngine;
 

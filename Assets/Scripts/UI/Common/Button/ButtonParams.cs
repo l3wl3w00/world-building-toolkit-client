@@ -1,4 +1,5 @@
-﻿namespace UI.Common.Button
+#nullable enable
+namespace UI.Common.Button
 {
     public interface IButtonParams
     {

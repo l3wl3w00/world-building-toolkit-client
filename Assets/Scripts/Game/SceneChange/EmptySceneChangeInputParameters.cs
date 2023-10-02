@@ -1,4 +1,5 @@
-﻿namespace Game.SceneChange
+#nullable enable
+namespace Game.SceneChange
 {
     public class EmptySceneChangeParameters : ISceneChangeParameters
     {

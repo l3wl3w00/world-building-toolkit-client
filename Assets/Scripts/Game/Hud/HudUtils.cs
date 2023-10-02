@@ -1,4 +1,5 @@
-﻿using System;
+#nullable enable
+using System;
 using Game.Hud.Button;
 using Game.Linq;
 using UnityEngine;

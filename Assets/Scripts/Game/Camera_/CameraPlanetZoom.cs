@@ -1,4 +1,5 @@
-﻿using JetBrains.Annotations;
+#nullable enable
+using JetBrains.Annotations;
 using UnityEngine;
 
 namespace Game.Camera_

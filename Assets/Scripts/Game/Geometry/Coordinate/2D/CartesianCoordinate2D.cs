@@ -1,4 +1,5 @@
-﻿using System;
+#nullable enable
+using System;
 using UnityEngine;
 
 namespace Game.Geometry.Coordinate._2D

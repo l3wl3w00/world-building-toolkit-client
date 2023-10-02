@@ -1,4 +1,5 @@
-﻿using UI.Common.Button;
+#nullable enable
+using UI.Common.Button;
 
 namespace Game.Hud.Button.Create
 {

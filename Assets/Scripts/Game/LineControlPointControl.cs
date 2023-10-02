@@ -1,3 +1,4 @@
+#nullable enable
 using Game.Planet;
 using UnityEngine;
 
