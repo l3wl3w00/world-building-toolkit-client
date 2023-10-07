@@ -2,7 +2,7 @@
 using System;
 using UnityEngine;
 
-namespace Game.Planet
+namespace Game.Model
 {
     public delegate LineRenderer LineRendererFactory();
 

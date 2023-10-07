@@ -57,8 +57,6 @@ namespace Game.Geometry.Sphere
 
         public void DrawCollider()
         {
-            if (_projection2D == null) return;
-
             var offset = _projection2D.offset;
             var trans = _projection2D.transform;
 

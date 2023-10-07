@@ -1,27 +1,30 @@
 #nullable enable
+using System;
 using System.Collections.Generic;
 using Game.Camera_;
+using Game.Util;
 using UnityEngine;
 
 namespace Game.Continent
 {
     internal class ContinentLineRendererHandler : MonoBehaviour
     {
-        private const float LineWidthScale = 0.02f;
+        private const float LineWidthScale = 0.01f;
 
-        private Camera _camera;
-        private ContinentControlPointHandler _continentControlPointHandler;
-        private LineRenderer _lineRenderer;
-        private LineRenderer LineRenderer => LazyInitialize(ref _lineRenderer);
+        private Option<Camera> _camera = Option<Camera>.None;
+        private Option<ContinentControlPointHandler> _continentControlPointHandler = Option<ContinentControlPointHandler>.None;
+        private Option<LineRenderer> _lineRenderer = Option<LineRenderer>.None;
+        private LineRenderer LineRenderer => this.LazyInitialize(ref _lineRenderer);
 
         private List<Vector3> DetailedGlobalPoints =>
-            LazyInitialize(ref _continentControlPointHandler).DetailedGlobalPoints;
+            this.LazyInitialize(ref _continentControlPointHandler).DetailedGlobalPoints;
 
         #region Event Functions
-
+        
         private void Update()
         {
-            var cameraPlanetEdgeDistance = transform.EdgeDistanceFromCamera(_camera);
+            var selfCamera = _camera.ExpectNotNull(nameof(_camera), (Action)Update);
+            var cameraPlanetEdgeDistance = transform.EdgeDistanceFromCamera(selfCamera);
 
             LineRenderer.endWidth = cameraPlanetEdgeDistance * LineWidthScale;
             LineRenderer.startWidth = cameraPlanetEdgeDistance * LineWidthScale;
@@ -31,7 +34,7 @@ namespace Game.Continent
 
         internal void Initialize(Camera initialCamera)
         {
-            _camera = initialCamera;
+            _camera = initialCamera.ToOption();
         }
 
         internal void UpdateLineRenderer()
@@ -39,14 +42,6 @@ namespace Game.Continent
             LineRenderer.positionCount = DetailedGlobalPoints.Count;
             LineRenderer.SetPositions(DetailedGlobalPoints.ToArray());
         }
-
-        private T LazyInitialize<T>(ref T component) where T : Component
-        {
-            if (component != null) return component;
-            component = GetComponent<T>();
-            return component;
-        }
-
         public void DeleteLines()
         {
             LineRenderer.positionCount = 0;

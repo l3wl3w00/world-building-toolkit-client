@@ -17,12 +17,9 @@ namespace Game.Planet
 {
     public class PlanetControl : MonoBehaviour, ISphere
     {
-        #region Constants
 
-        private const float Speed = 0.5f;
-
-        #endregion
-
+        [SerializeField] private float rotationSpeed = 0.5f;
+        
         #region Member Variables
 
         private Vector3 _lastMousePosition;
@@ -30,7 +27,7 @@ namespace Game.Planet
         #endregion
 
         public UnityEvent Rotated { get; } = new();
-        public UnityEvent<ContinentHandler?> ContinentInCreationChanged { get; } = new();
+        public UnityEvent<Option<ContinentHandler>> ContinentInCreationChanged { get; } = new();
 
         public UnityEvent<Option<ContinentHandler>, Option<ContinentHandler>> SelectedContinentChanged { get; } = new();
 
@@ -59,49 +56,37 @@ namespace Game.Planet
 
 
         #region LoadContinents
-
-        private void LoadContinents(WorldDetailedDto? worldDetailed)
+        
+        void CreateContinents(WorldDetailedDto worldDetailed)
         {
-            if (worldDetailed == null) return;
-            foreach (var continent in worldDetailed.continents)
+            foreach (var continent in worldDetailed.Continents)
             {
-                var controlPoints = continent.bounds
+                var controlPoints = continent.Bounds
                     .Select(b =>
-                        new SphereSurfaceCoordinate(b.radius, b.polar.AsRadians(), b.azimuthal.AsRadians()))
+                        new SphereSurfaceCoordinate(b.Radius, b.Polar.AsRadians(), b.Azimuthal.AsRadians()))
                     .ToList();
-                CreateContinent(continent, controlPoints);
-            }
-
-            return;
-
-            void CreateContinent(ContinentDto continentDto, List<SphereSurfaceCoordinate>? controlPoints)
-            {
-                ContinentHandler.CreateGameObject(this, continentDto, controlPoints, mainCamera);
+                ContinentHandler.CreateGameObject(this, continent, controlPoints);
             }
         }
-
         #endregion
 
         public void DestroyActiveContinent()
         {
-            if (ContinentInCreation == null) return;
-            Destroy(ContinentInCreation!.gameObject);
+            ContinentInCreation.DoIfNotNull(c => Destroy(c.gameObject));
         }
 
         #region EditorFields
 
-        [SerializeField] private GameObject? continentPrefab;
-        [SerializeField] private Camera? mainCamera;
-        private ContinentHandler? _continentInCreation;
+        [SerializeField] private GameObject continentPrefab = null!; // asserted in Awake
+        [SerializeField] private Camera mainCamera = null!; // asserted in Awake
+        private Option<ContinentHandler> _continentInCreation = Option<ContinentHandler>.None;
         private Option<ContinentHandler> _selectedContinent = Option<ContinentHandler>.None;
 
         #endregion
 
         #region Properties
-
-        public Camera? MainCamera => mainCamera;
-
-        public ContinentHandler? ContinentInCreation
+        
+        public Option<ContinentHandler> ContinentInCreation
         {
             get => _continentInCreation;
             set
@@ -117,7 +102,7 @@ namespace Game.Planet
             get => _selectedContinent;
             set
             {
-                if (ContinentInCreation != null && value.HasValue)
+                if (ContinentInCreation.HasValue && value.HasValue)
                 {
                     Debug.LogWarning("tried to select continent while another is in creation");
                     return;
@@ -132,13 +117,14 @@ namespace Game.Planet
         public bool IsAnyContinentSelected => !NoContinentSelected;
         public bool NoContinentSelected => SelectedContinent.NoValue;
 
-        public Planet Planet { get; set; }
+        public Model.Planet Planet { get; set; }
 
         public ICoordinate3D Center => transform.position.ToCartesian();
 
         public Quaternion Rotation => transform.rotation;
 
         public float Radius => transform.localScale.x;
+        public Camera MainCamera => mainCamera;
 
         #endregion
 
@@ -148,32 +134,25 @@ namespace Game.Planet
 
         private void Awake()
         {
-            SetCameraIfNull();
+            NullChecker.AssertNoneIsNullInType(GetType(),mainCamera, continentPrefab);
 
             var sceneChangeParameters = ISceneChangeParameters.Instance;
             var world = GetWorld();
 
             Planet = DtoToPlanet(world);
-            LoadContinents(world);
+            CreateContinents(world);
+            
             return;
-
-            WorldDetailedDto? GetWorld()
+            WorldDetailedDto GetWorld()
             {
-                return sceneChangeParameters.Get<WorldDetailedDto>(SceneParamKey.WorldDetailed);
+                return sceneChangeParameters.GetNonNullable<WorldDetailedDto>(SceneParamKey.WorldDetailed);
             }
-
-            void SetCameraIfNull()
+            
+            Model.Planet DtoToPlanet(Option<WorldDetailedDto> worldDetailedDto)
             {
-                if (MainCamera != null) return;
-                Debug.Log("Main camera was not set manually");
-                mainCamera = Camera.main;
-            }
-
-            Planet DtoToPlanet(WorldDetailedDto? worldDetailedDto)
-            {
-                if (worldDetailedDto == null) return new Planet(Guid.Empty);
-
-                return new Planet(world.id, world.name, world.description);
+                return worldDetailedDto.Map(
+                    onHasValue: w => new Model.Planet(w.Id, w.Name, w.Description),
+                    valueOnNull: new Model.Planet(Guid.Empty));
             }
         }
 
@@ -191,7 +170,7 @@ namespace Game.Planet
             else if (Input.GetMouseButton(1))
             {
                 var selfTransform = transform;
-                var cameraPlanetEdgeDistance = selfTransform.EdgeDistanceFromCamera(MainCamera);
+                var cameraPlanetEdgeDistance = selfTransform.EdgeDistanceFromCamera(mainCamera);
 
                 // When the mouse is held down, rotate the sphere
                 var delta = _lastMousePosition - Input.mousePosition;
@@ -199,7 +178,7 @@ namespace Game.Planet
 
                 var axis = new Vector3(-delta.y, delta.x, 0);
 
-                selfTransform.Rotate(axis * (Speed * Time.deltaTime * cameraPlanetEdgeDistance), Space.World);
+                selfTransform.Rotate(axis * (rotationSpeed * Time.deltaTime * cameraPlanetEdgeDistance), Space.World);
 
                 Rotated.Invoke();
             }
@@ -209,18 +188,13 @@ namespace Game.Planet
 
         private void OnMouseDown()
         {
-            var ray = mainCamera!.ScreenPointToRay(Input.mousePosition);
+            var ray = mainCamera.ScreenPointToRay(Input.mousePosition);
             var raycastSuccessful = Physics.Raycast(ray, out var hit);
 
             if (!raycastSuccessful) return;
 
-            var hitCollider = hit.collider as SphereCollider;
-
-            if (hitCollider == null)
-            {
-                Debug.Log("ray hit something that is not a SphereCollider");
-                return;
-            }
+            hit.collider.Cast<Collider, SphereCollider>()
+                .ExpectNotNull("ray hit something that is not a SphereCollider");
 
             Clicked.Invoke(hit.point);
         }

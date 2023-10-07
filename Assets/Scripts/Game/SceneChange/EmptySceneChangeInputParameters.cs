@@ -1,4 +1,7 @@
-#nullable enable
+﻿#nullable enable
+using Game.Util;
+using UnityEngine;
+
 namespace Game.SceneChange
 {
     public class EmptySceneChangeParameters : ISceneChangeParameters
@@ -11,9 +14,9 @@ namespace Game.SceneChange
         {
         }
 
-        public T Get<T>(SceneParamKey key)
+        public Option<T> Get<T>(SceneParamKey key)
         {
-            return default;
+            return Option<T>.None;
         }
     }
 }

@@ -25,7 +25,7 @@ namespace WorldBuilder.Client.Editor
             codeBuilder.AppendLine("using UnityEngine;");
 
             // Create the namespace
-            codeBuilder.AppendLine("namespace WorldBuilder.Client.Generated");
+            codeBuilder.AppendLine("namespace Generated");
             codeBuilder.AppendLine("{");
             var className = "Prefab";
             // Create the class signature
@@ -70,7 +70,7 @@ namespace WorldBuilder.Client.Editor
             sb.AppendLine("using UnityEngine;");
 
             // Create the namespace
-            sb.AppendLine("namespace WorldBuilder.Client.Generated");
+            sb.AppendLine("namespace Generated");
             sb.AppendLine("{");
             sb.AppendLine("\tpublic class Scenes");
             sb.AppendLine("\t{");

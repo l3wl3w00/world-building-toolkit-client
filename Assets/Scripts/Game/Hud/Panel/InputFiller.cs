@@ -1,4 +1,5 @@
 ﻿#nullable enable
+using System;
 using Game.Planet;
 using Game.Util;
 using TMPro;
@@ -17,7 +18,7 @@ namespace Game.Hud.Panel
         where TComponent : Component
         where TInput : notnull
     {
-        private PlanetControl? _planetControl;
+        private Option<PlanetControl> _planetControl = Option<PlanetControl>.None;
 
         #region IInputFiller Members
 
@@ -25,8 +26,8 @@ namespace Game.Hud.Panel
 
         public PlanetControl PlanetControl
         {
-            protected get => _planetControl!;
-            set => _planetControl = value;
+            protected get => _planetControl.ExpectNotNull(nameof(_planetControl), new Func<PlanetControl>(() => PlanetControl));
+            set => _planetControl = value.ToOption();
         }
 
         #endregion

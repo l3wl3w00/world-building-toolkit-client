@@ -16,10 +16,9 @@ namespace UI.MainMenu.Button
         {
             var worldDetailed = new WorldDetailedDto
             {
-                id = Guid.Empty.ToString(),
-                continents = new List<ContinentDto>(),
-                description = "",
-                name = ""
+                Id = Guid.Empty,
+                Description = "",
+                Name = ""
             };
             new SceneParametersBuilder()
                 .Add(SceneParamKey.WorldDetailed, worldDetailed)

@@ -1,4 +1,6 @@
 #nullable enable
+using System;
+using Game.Util;
 using UnityEngine;
 
 namespace Game.Camera_
@@ -9,11 +11,16 @@ namespace Game.Camera_
 
         #region Serialized Fields
 
-        public Transform planetTransform;
+        public Transform planetTransform = null!; // asserted in Awake
 
         #endregion
 
         #region Event Functions
+
+        private void Awake()
+        {
+            NullChecker.AssertNoneIsNullInType(GetType(), planetTransform);
+        }
 
         private void Update()
         {

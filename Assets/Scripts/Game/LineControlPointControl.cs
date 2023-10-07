@@ -1,5 +1,7 @@
 #nullable enable
+using System;
 using Game.Planet;
+using Game.Util;
 using UnityEngine;
 
 namespace Game
@@ -8,21 +10,21 @@ namespace Game
     {
         #region Serialized Fields
 
-        public PlanetControl planetControl;
-
-        #endregion
-
-        #region Properties
-
-        public Camera Camera { private get; set; }
+        [SerializeField] private PlanetControl planetControl = null!; // asserted in Awake
+        [SerializeField] private Camera mainCamera = null!; // asserted in Awake
 
         #endregion
 
         #region Event Functions
 
+        private void Awake()
+        {
+            NullChecker.AssertNoneIsNullInType(GetType(), planetControl, mainCamera);
+        }
+
         private void Update()
         {
-            var ray = Camera.ScreenPointToRay(Input.mousePosition);
+            var ray = GetComponent<Camera>().ScreenPointToRay(Input.mousePosition);
 
             var raycastSuccessful = Physics.Raycast(ray, out var hit);
             if (!raycastSuccessful) return;

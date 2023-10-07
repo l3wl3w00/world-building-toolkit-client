@@ -8,7 +8,7 @@ namespace Game.Hud.Button.Default
 {
     public class BackButtonOnEditHud : HudButtonControl<NoButtonParams>
     {
-        protected override void OnClickedTypesafe(NoButtonParams? buttonParams)
+        protected override void OnClickedTypesafe(NoButtonParams buttonParams)
         {
             if (HudController.HasPreviousScreen())
             {

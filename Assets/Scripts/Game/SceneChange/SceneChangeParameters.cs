@@ -1,5 +1,6 @@
-#nullable enable
+﻿#nullable enable
 using System.Collections.Generic;
+using Game.Util;
 using UnityEngine;
 
 namespace Game.SceneChange
@@ -29,9 +30,9 @@ namespace Game.SceneChange
             Values.Add(key, value);
         }
 
-        public T Get<T>(SceneParamKey key)
+        public Option<T> Get<T>(SceneParamKey key)
         {
-            return (T)Values[key];
+            return ((T)Values[key]).ToOption();
         }
 
         public void Destroy()

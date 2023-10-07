@@ -16,11 +16,8 @@ namespace Game.Camera_
             return distanceFromPlanetCenter - planetRadius;
         }
 
-        public static float EdgeDistanceFromCamera(this Transform planetTransform, [CanBeNull] Camera camera)
-        {
-            Debug.Assert(camera != null);
-
-            return planetTransform.EdgeDistanceFrom(camera.transform);
-        }
+        public static float EdgeDistanceFromCamera(this Transform planetTransform, Camera camera) => 
+            planetTransform.EdgeDistanceFrom(camera.transform);
+        
     }
 }

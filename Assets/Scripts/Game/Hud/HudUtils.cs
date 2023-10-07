@@ -8,11 +8,9 @@ namespace Game.Hud
 {
     public static class HudUtils
     {
-        public static void ForEachHudButtonControl(this GameObject gameObject,
-            Action<IHudButtonControl> actionOnHudButton)
-        {
-            gameObject.GetComponentsInChildren<IHudButtonControl>()
-                .ForEach(b => actionOnHudButton?.Invoke(b));
-        }
+        public static void ForEachHudButtonControl(
+            this GameObject gameObject, 
+            Action<IHudButtonControl> actionOnHudButton) =>
+            gameObject.GetComponentsInChildren<IHudButtonControl>().ForEach(actionOnHudButton.Invoke);
     }
 }

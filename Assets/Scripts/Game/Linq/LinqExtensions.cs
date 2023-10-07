@@ -9,7 +9,7 @@ namespace Game.Linq
     {
         public static void ForEach<T>(this IEnumerable<T> enumerable, Action<T> actionOnT)
         {
-            foreach (var item in enumerable) actionOnT?.Invoke(item);
+            foreach (var item in enumerable) actionOnT.Invoke(item);
         }
 
         public static void IndexedForEach<T>(this IEnumerable<T> enumerable, Action<int, T> actionOnT)
@@ -17,7 +17,7 @@ namespace Game.Linq
             var i = 0;
             foreach (var item in enumerable)
             {
-                actionOnT?.Invoke(i, item);
+                actionOnT.Invoke(i, item);
                 i++;
             }
         }

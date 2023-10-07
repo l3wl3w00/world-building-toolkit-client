@@ -2,8 +2,10 @@
 using System;
 using System.Net;
 using System.Threading.Tasks;
+using CodiceApp.EventTracking.Plastic;
 using Common;
 using Game.Constants;
+using Game.Util;
 using Generated;
 using UnityEngine;
 
@@ -12,74 +14,74 @@ namespace UI.OAuth
     public class OAuthCallbackListener : MonoBehaviour
     {
         private readonly ITimeProvider _timeProvider = new SystemTimeProvider();
-        private UnityMainThreadDispatcher _unityMainThreadDispatcher;
-        private HttpListener listener;
-        private Task listenerTask;
+        private Option<UnityMainThreadDispatcher> _unityMainThreadDispatcher = Option<UnityMainThreadDispatcher>.None;
+        private Option<HttpListener> _listener = Option<HttpListener>.None;
 
         #region Event Functions
 
         private void Start()
         {
-            _unityMainThreadDispatcher = UnityMainThreadDispatcher.Instance;
             StartServer();
-            listenerTask = Task.Run(CheckForRequests); // Start only one task
+            _unityMainThreadDispatcher = UnityMainThreadDispatcher.Instance.ToOption();
+            Task.Run(CheckForRequests);
         }
-
-        private void Update()
-        {
-            // Handle main-thread-only tasks if necessary
-        }
-
         private void OnDestroy()
         {
-            // Stop the listener when the GameObject is destroyed
-            if (listener is { IsListening: true }) listener.Stop();
+            _listener.DoIfNotNull(l => { if (l.IsListening) l.Stop(); });
         }
 
         #endregion
 
         private void StartServer()
         {
-            listener = new HttpListener();
-            listener.Prefixes.Add("http://localhost:8080/");
-            listener.Start();
+            _listener = new HttpListener().ToOption()
+                .DoIfNotNull(l => l.Prefixes.Add("http://localhost:8080/"))
+                .DoIfNotNull(l => l.Start());
         }
 
         private async Task CheckForRequests()
         {
-            try
+            await _listener.DoIfNotNullAsync(async listener =>
             {
-                while (listener.IsListening)
+                try
                 {
-                    var context = await listener.GetContextAsync();
-                    var request = context.Request;
-
-                    // Read the OAuth code or token from the request
-                    var token = request.QueryString["token"];
-                    var expiration = int.Parse(request.QueryString["expires"]);
-                    listener.Stop();
-                    if (!string.IsNullOrEmpty(token))
-                        // Handle token
-                        // Dispatch this back to Unity main thread if needed
-                        _unityMainThreadDispatcher.Enqueue(() =>
-                        {
-                            PlayerPrefs.SetString(AuthConstants.GoogleTokenKey, token);
-                            PlayerPrefs.SetInt(AuthConstants.GoogleTokenExpirationKey, expiration);
-                            PlayerPrefs.SetString(AuthConstants.GoogleTokenSaveDateKey,
-                                _timeProvider.Now.ToBinary().ToString());
-                            PlayerPrefs.Save();
-                            Scenes.MainMenuScreen.Load();
-                        });
+                    await ListeningLoop(listener);
                 }
-            }
-            catch (Exception e)
+                catch (Exception e)
+                {
+                    Debug.LogError("An error occurred: " + e.Message);
+                }
+                finally
+                {
+                    listener.Stop();
+                }
+            });
+
+        }
+
+        private async Task ListeningLoop(HttpListener listener)
+        {
+            while (listener.IsListening)
             {
-                // Handle exception
-                Debug.LogError("An error occurred: " + e.Message);
-            }
-            finally
-            {
+                var context = await listener.GetContextAsync();
+                var request = context.Request;
+
+                var token = request.QueryString["token"];
+                var expiration = int.Parse(request.QueryString["expires"]);
                 listener.Stop();
+                if (string.IsNullOrEmpty(token)) return;
+                
+                _unityMainThreadDispatcher
+                    .ExpectNotNull(nameof(_unityMainThreadDispatcher), (Func<HttpListener, Task>) ListeningLoop)
+                    .Enqueue(() =>
+                    {
+                        PlayerPrefs.SetString(AuthConstants.GoogleTokenKey, token);
+                        PlayerPrefs.SetInt(AuthConstants.GoogleTokenExpirationKey, expiration);
+                        PlayerPrefs.SetString(AuthConstants.GoogleTokenSaveDateKey,
+                            _timeProvider.Now.ToBinary().ToString());
+                        PlayerPrefs.Save();
+                        Scenes.MainMenuScreen.Load();
+                    });
             }
         }
     }

@@ -5,6 +5,7 @@ using Game.Client;
 using Game.Constants;
 using Game.Hud;
 using Game.SceneChange;
+using Game.Util;
 using Generated;
 using UnityEngine;
 
@@ -17,7 +18,7 @@ namespace Game
         // Start is called before the first frame update
         private void Start()
         {
-            var worldId = ISceneChangeParameters.Instance.Get<Guid>(SceneParamKey.WorldId);
+            var worldId = ISceneChangeParameters.Instance.GetNonNullable<Guid>(SceneParamKey.WorldId);
             var client = new WorldBuildingApiClient(PlayerPrefs.GetString(AuthConstants.GoogleTokenKey));
             StartCoroutine(client.GetWorld(worldId, worldDetailed =>
             {

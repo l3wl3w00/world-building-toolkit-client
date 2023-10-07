@@ -7,7 +7,7 @@ namespace Game.Hud.Panel
     {
         protected override Option<bool> GetValue()
         {
-            return PlanetControl.SelectedContinent.MapIfNotNull(c => c.Invert);
+            return PlanetControl.SelectedContinent.NoneOr(c => c.Invert);
         }
     }
 }

@@ -1,14 +1,15 @@
 #nullable enable
 using System;
 using System.Collections.Generic;
+using Game.Util;
 using UnityEngine;
 
 namespace Common
 {
     public class UnityMainThreadDispatcher : MonoBehaviour
     {
-        private static UnityMainThreadDispatcher _instance;
-        private readonly Queue<Action> actionQueue = new();
+        private static Option<UnityMainThreadDispatcher> _instance = Option<UnityMainThreadDispatcher>.None;
+        private readonly Queue<Action> _actionQueue = new();
 
         #region Properties
 
@@ -16,14 +17,13 @@ namespace Common
         {
             get
             {
-                if (_instance == null)
-                {
-                    var go = new GameObject("UnityMainThreadDispatcher");
-                    DontDestroyOnLoad(go);
-                    _instance = go.AddComponent<UnityMainThreadDispatcher>();
-                }
-
-                return _instance;
+                if (_instance.HasValue) return _instance.Value;
+            
+                var dispatcherGameObject = new GameObject("UnityMainThreadDispatcher");
+                DontDestroyOnLoad(dispatcherGameObject);
+                _instance = dispatcherGameObject.AddComponent<UnityMainThreadDispatcher>().ToOption();
+                
+                return _instance.Value;
             }
         }
 
@@ -33,9 +33,9 @@ namespace Common
 
         private void Update()
         {
-            lock (actionQueue)
+            lock (_actionQueue)
             {
-                while (actionQueue.Count > 0) actionQueue.Dequeue().Invoke();
+                while (_actionQueue.Count > 0) _actionQueue.Dequeue().Invoke();
             }
         }
 
@@ -43,9 +43,9 @@ namespace Common
 
         public void Enqueue(Action action)
         {
-            lock (actionQueue)
+            lock (_actionQueue)
             {
-                actionQueue.Enqueue(action);
+                _actionQueue.Enqueue(action);
             }
         }
     }

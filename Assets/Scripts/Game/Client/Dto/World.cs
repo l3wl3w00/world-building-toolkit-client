@@ -4,38 +4,23 @@ using System.Collections.Generic;
 
 namespace Game.Client.Dto
 {
-    [Serializable]
-    public record WorldSummaryDto
+    public record WorldSummaryDto : JsonSerializable<WorldSummaryDto>
     {
-        #region Serialized Fields
-
-        public string id;
-        public string name;
-
-        #endregion
+        public Guid Id { get; set; }
+        public string Name { get; set; } = "";
     }
 
-    [Serializable]
-    public record CreateWorldDto
+    public record CreateWorldDto : JsonSerializable<CreateWorldDto>
     {
-        #region Serialized Fields
-
-        public string name;
-        public string description;
-
-        #endregion
+        public string Name { get; set; } = "";
+        public string Description { get; set; } = "";
     }
 
-    [Serializable]
-    public record WorldDetailedDto
+    public record WorldDetailedDto : JsonSerializable<WorldDetailedDto>
     {
-        #region Serialized Fields
-
-        public string id;
-        public string name;
-        public string description;
-        public List<ContinentDto> continents;
-
-        #endregion
+        public Guid Id { get; set; }
+        public string Name { get; set; } = "";
+        public string Description { get; set; } = "";
+        public List<ContinentDto> Continents { get; set; } = new();
     }
 }

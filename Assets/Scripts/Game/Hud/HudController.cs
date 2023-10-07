@@ -1,4 +1,5 @@
 #nullable enable
+using System;
 using System.Collections.Generic;
 using Common;
 using Game.Continent;
@@ -25,8 +26,8 @@ namespace Game.Hud
     {
         #region Serialized Fields
 
-        [SerializeField] private Canvas? canvas;
-        [SerializeField] private PlanetControl? planetControl;
+        [SerializeField] private Canvas canvas = null!; // asserted in Awake
+        [SerializeField] private PlanetControl planetControl = null!; // asserted in Awake
 
         #endregion
 
@@ -55,6 +56,11 @@ namespace Game.Hud
 
         #region Event Functions
 
+        private void Awake()
+        {
+            NullChecker.AssertNoneIsNullInType(GetType(), canvas, planetControl);
+        }
+
         private void Start()
         {
             FillHudMap();
@@ -64,7 +70,7 @@ namespace Game.Hud
 
             planetControl.SelectedContinentChanged.AddListener(OnSelectedContinentChanged);
 
-            CurrentHudScreen = ISceneChangeParameters.Instance.Get<HudScreen>(SceneParamKey.InitialScreen);
+            CurrentHudScreen = ISceneChangeParameters.Instance.GetNonNullable<HudScreen>(SceneParamKey.InitialScreen);
             UpdateInputFields();
         }
 
@@ -84,7 +90,7 @@ namespace Game.Hud
         public void UpdateInputFields()
         {
             Debug.Log("Update input fields");
-            _hudMap.Values.ForEach(v => v.GetComponentsInChildren<IInputFiller>().ForEach(t => t.UpdateValue()));
+            _hudMap[_currentHudScreen].GetComponentsInChildren<IInputFiller>().ForEach(t => t.UpdateValue());
         }
 
         public bool HasPreviousScreen()
@@ -106,7 +112,7 @@ namespace Game.Hud
         public void ToDefaultPanel()
         {
             CurrentHudScreen = HudScreen.PlanetEdit;
-            planetControl.ContinentInCreation = null;
+            planetControl.ContinentInCreation = Option<ContinentHandler>.None;
         }
 
         #region StartHelpers
@@ -115,7 +121,7 @@ namespace Game.Hud
         {
             _hudMap.Add(HudScreen.PlanetEdit, Prefab.EditPlanetPanel.Instantiate(canvas.transform));
             _hudMap.Add(HudScreen.PlanetCreate, Prefab.CreatePlanetPanel.Instantiate(canvas.transform));
-            _hudMap.Add(HudScreen.ContinentCreate, Prefab.CreateContinentPanel.Instantiate(canvas.transform));
+            _hudMap.Add(HudScreen.ContinentCreate, Prefab.CreateBoundedPanel.Instantiate(canvas.transform));
             _hudMap.Add(HudScreen.ContinentEdit, Prefab.EditContinentPanel.Instantiate(canvas.transform));
             _hudMap.Add(HudScreen.Null, new GameObject("Null HudScreen"));
         }

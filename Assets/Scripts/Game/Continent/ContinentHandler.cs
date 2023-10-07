@@ -22,23 +22,20 @@ namespace Game.Continent
     public class ContinentHandler : MonoBehaviour
     {
         private static long _continentCounter;
-        private Camera? _camera;
-        private ContinentControlPointHandler? _continentControlPointHandler;
+        private Option<ContinentControlPointHandler> _continentControlPointHandler = Option<ContinentControlPointHandler>.None;
+        private Option<ContinentLineRendererHandler> _continentLineHandler = Option<ContinentLineRendererHandler>.None;
+        private Option<ContinentMeshHandler> _continentMeshHandler = Option<ContinentMeshHandler>.None;
+        private Option<PlanetControl> _planetControl = Option<PlanetControl>.None;
 
-        private ContinentLineRendererHandler? _continentLineHandler;
-        private ContinentMeshHandler? _continentMeshHandler;
-        private PlanetControl? _planetControl;
-
-        private ContinentLineRendererHandler ContinentLineRendererHandler =>
+        private ContinentLineRendererHandler ContinentLineRendererHandler => 
             this.LazyInitialize(ref _continentLineHandler);
-
-        private ContinentMeshHandler ContinentMeshHandler => this.LazyInitialize(ref _continentMeshHandler);
-
+        private ContinentMeshHandler ContinentMeshHandler => 
+            this.LazyInitialize(ref _continentMeshHandler);
         private ContinentControlPointHandler ContinentControlPointHandler =>
             this.LazyInitialize(ref _continentControlPointHandler);
 
         public List<SphereSurfaceCoordinate> ControlPoints => ContinentControlPointHandler.ControlPoints;
-        public PlanetControl PlanetControl => ContinentControlPointHandler.PlanetControl;
+        public PlanetControl PlanetControl => _planetControl.ExpectNotNull(nameof(_planetControl), new Func<PlanetControl>(() => PlanetControl));
         public UnityEvent Selected { get; } = new();
         public UnityEvent DeSelected { get; } = new();
 
@@ -55,8 +52,8 @@ namespace Game.Continent
         {
             get
             {
-                if (_planetControl.ContinentInCreation == this) return ContinentState.InCreation;
-                if (_planetControl.SelectedContinent.NullableValue == this) return ContinentState.Selected;
+                if (PlanetControl.ContinentInCreation.NullableValue == this) return ContinentState.InCreation;
+                if (PlanetControl.SelectedContinent.NullableValue == this) return ContinentState.Selected;
                 return ContinentState.Inactive;
             }
         }
@@ -70,10 +67,10 @@ namespace Game.Continent
             switch (ContinentState)
             {
                 case ContinentState.Selected:
-                    _planetControl.SelectedContinent = Option<ContinentHandler>.None;
+                    PlanetControl.SelectedContinent = Option<ContinentHandler>.None;
                     break;
                 case ContinentState.Inactive:
-                    _planetControl.SelectedContinent = Option<ContinentHandler>.Some(this);
+                    PlanetControl.SelectedContinent = Option<ContinentHandler>.Some(this);
                     break;
                 case ContinentState.InCreation: break;
                 default:
@@ -108,9 +105,9 @@ namespace Game.Continent
             ContinentLineRendererHandler.UpdateLineRenderer();
         }
 
-        private void OnActiveContinentChanged(ContinentHandler? c)
+        private void OnActiveContinentChanged(Option<ContinentHandler> c)
         {
-            DrawOrDeleteLines(c.ToOption());
+            DrawOrDeleteLines(c);
         }
 
         private void OnSelectedContinentChanged(Option<ContinentHandler> oldContinent,
@@ -150,11 +147,12 @@ namespace Game.Continent
             ContinentLineRendererHandler.DeleteLines();
         }
 
-        private void Initialize(ContinentDto? continentDto, Camera initialCamera,
+        private void Initialize(
+            Option<ContinentDto> continentDto, 
+            Camera initialCamera,
             List<SphereSurfaceCoordinate> controlPoints,
             PlanetControl planetControl)
         {
-            _camera = initialCamera;
             _planetControl = planetControl;
             ContinentControlPointHandler.Initialize(controlPoints, planetControl);
             ContinentLineRendererHandler.Initialize(initialCamera);
@@ -163,38 +161,28 @@ namespace Game.Continent
             planetControl.SelectedContinentChanged.AddListener(OnSelectedContinentChanged);
             planetControl.Clicked.AddListener(OnPlanetClicked);
 
-            if (continentDto == null) return;
-
-            ContinentName = continentDto.name;
-            ContinentDescription = continentDto.description;
-            Invert = continentDto.inverted;
-
-            TrySetId();
-            return;
-
-            void TrySetId()
+            continentDto.DoIfNotNull(dto =>
             {
-                try
-                {
-                    Id = Guid.Parse(continentDto.id);
-                }
-                catch (FormatException)
-                {
-                    Debug.LogError($"Id form ContinentDto is not in proper format: {continentDto}");
-                    Id = Guid.Empty;
-                }
-            }
+                ContinentName = dto.Name;
+                ContinentDescription = dto.Description;
+                Invert = dto.Inverted;
+                Id = dto.Id;
+            });
+
         }
 
-
-        public static ContinentHandler CreateGameObject(PlanetControl planetControl, ContinentDto? continentDto = null,
-            List<SphereSurfaceCoordinate>? controlPoints = null, Camera? camera = null)
+        public static ContinentHandler CreateGameObject(PlanetControl planetControl)
         {
-            camera ??= Camera.main!;
-            controlPoints ??= new List<SphereSurfaceCoordinate>();
+            return CreateGameObject(planetControl, Option<ContinentDto>.None, new());
+        }
 
+        public static ContinentHandler CreateGameObject(
+            PlanetControl planetControl, 
+            Option<ContinentDto> continentDto,
+            List<SphereSurfaceCoordinate> controlPoints)
+        {
             var continent = Prefab.Continent.Instantiate(planetControl.transform).GetComponent<ContinentHandler>();
-            continent.Initialize(continentDto, camera, controlPoints, planetControl);
+            continent.Initialize(continentDto, planetControl.MainCamera, controlPoints, planetControl);
             continent.name = "Continent" + _continentCounter++;
             continent.UpdateMesh();
             return continent;

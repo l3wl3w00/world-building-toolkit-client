@@ -1,4 +1,6 @@
-#nullable enable
+﻿#nullable enable
+using Game.Continent;
+using Game.Util;
 using UI.Common.Button;
 
 namespace Game.Hud.Button.Create
@@ -9,7 +11,7 @@ namespace Game.Hud.Button.Create
         {
             PlanetControl.DestroyActiveContinent();
             HudController.ToPreviousScreen();
-            PlanetControl.ContinentInCreation = null;
+            PlanetControl.ContinentInCreation = Option<ContinentHandler>.None;
         }
     }
 }

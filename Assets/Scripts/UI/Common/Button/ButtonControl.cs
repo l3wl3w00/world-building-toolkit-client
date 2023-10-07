@@ -1,4 +1,5 @@
 #nullable enable
+using Game.Util;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -12,28 +13,18 @@ namespace UI.Common.Button
 
         private void Start()
         {
-            var button = GetComponent<UnityEngine.UI.Button>();
-            var toggle = GetComponent<Toggle>();
-            if (button is null && toggle is null)
-            {
+            var button = GetComponent<UnityEngine.UI.Button>().ToOption();
+            var toggle = GetComponent<Toggle>().ToOption();
+            if (button.NoValue && toggle.NoValue) 
                 Debug.LogError($"ButtonControl applied to {name}, which has no Button or Toggle Component");
-                return;
-            }
 
-            if (button is not null) button.onClick.AddListener(ButtonListener);
-            if (toggle is not null) toggle.onValueChanged.AddListener(ToggleListener);
+            button.DoIfNotNull(b => b.onClick.AddListener(ButtonListener));
+            toggle.DoIfNotNull(t => t.onValueChanged.AddListener(ToggleListener));
             OnStart();
             return;
 
-            void ToggleListener(bool v)
-            {
-                OnClicked(new ToggleButtonParams(v));
-            }
-
-            void ButtonListener()
-            {
-                OnClicked(new NoButtonParams());
-            }
+            void ToggleListener(bool v) => OnClicked(new ToggleButtonParams(v));
+            void ButtonListener() => OnClicked(new NoButtonParams());
         }
 
         #endregion

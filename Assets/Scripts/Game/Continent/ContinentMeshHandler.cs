@@ -2,6 +2,7 @@
 using System.Linq;
 using Game.Geometry.Sphere;
 using Game.Projection;
+using Game.Util;
 using ProceduralToolkit;
 using UnityEngine;
 
@@ -10,10 +11,10 @@ namespace Game.Continent
     internal class ContinentMeshHandler : MonoBehaviour
     {
         // ReSharper disable once InconsistentNaming
-        private PolygonOnSphere? __debugPolygonOnSphere;
-        private ContinentControlPointHandler? _continentControlPointHandler;
-        private MeshCollider? _meshCollider;
-        private MeshFilter? _meshFilter;
+        // private PolygonOnSphere? __debugPolygonOnSphere;
+        private Option<ContinentControlPointHandler> _continentControlPointHandler = Option<ContinentControlPointHandler>.None;
+        private Option<MeshCollider> _meshCollider = Option<MeshCollider>.None;
+        private Option<MeshFilter> _meshFilter = Option<MeshFilter>.None;
         internal bool Invert { get; set; }
 
         private ContinentControlPointHandler ContinentControlPointHandler =>
@@ -26,7 +27,7 @@ namespace Game.Continent
 
         private void Update()
         {
-            __debugPolygonOnSphere?.DrawCollider();
+            // __debugPolygonOnSphere?.DrawCollider();
         }
 
         #endregion
@@ -38,7 +39,7 @@ namespace Game.Continent
             ContinentControlPointHandler.ReCreateGlobalPoints();
             var draft = CreateSphereMeshDraft(700, 700);
             using var polygonOnSphere = CreatePolygonOnSphere();
-            __debugPolygonOnSphere = polygonOnSphere;
+            // __debugPolygonOnSphere = polygonOnSphere;
             RemoveAllNotContainedTriangles(draft, polygonOnSphere);
             // polygonOnSphere.DrawCollider();
             var mesh = draft.ToMesh();
@@ -120,19 +121,5 @@ namespace Game.Continent
             var v3 = meshDraft.vertices[v3Index];
             return (v1, v2, v3);
         }
-
-        // private void OnMouseEnter()
-        // {
-        //     Renderer rend = GetComponent<Renderer>();
-        //     
-        //     rend.material.color = Color.red; 
-        // }
-        //
-        // private void OnMouseExit()
-        // {
-        //     Renderer rend = GetComponent<Renderer>();
-        //     
-        //     rend.material.color = Color.green; 
-        // }
     }
 }

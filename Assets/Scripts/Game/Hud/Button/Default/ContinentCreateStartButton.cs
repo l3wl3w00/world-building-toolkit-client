@@ -1,5 +1,7 @@
 #nullable enable
+using Game.Client.Dto;
 using Game.Continent;
+using Game.Util;
 using UI.Common.Button;
 
 namespace Game.Hud.Button.Default
@@ -8,7 +10,7 @@ namespace Game.Hud.Button.Default
     {
         protected override void OnClickedTypesafe(NoButtonParams buttonParams)
         {
-            PlanetControl.ContinentInCreation = ContinentHandler.CreateGameObject(PlanetControl);
+            PlanetControl.ContinentInCreation = ContinentHandler.CreateGameObject(PlanetControl).ToOption();
             HudController.CurrentHudScreen = HudScreen.ContinentCreate;
         }
     }

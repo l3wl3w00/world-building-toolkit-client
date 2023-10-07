@@ -485,7 +485,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fdf8b17cb6c6496081eff3e9f1ff845f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  removeAllPreviousListeners: 1
 --- !u!224 &463904989 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 7177608986217963413, guid: e6a8245f34a03d3459d2c77621fd1512, type: 3}
@@ -1264,8 +1263,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   contentTransform: {fileID: 891298674}
-  itemPrefab: {fileID: 8772807672606643853, guid: d37370abe02719649941df143a668f4f, type: 3}
-  canvas: {fileID: 852296311}
+  uiItemPrefab: {fileID: 8772807672606643853, guid: d37370abe02719649941df143a668f4f, type: 3}
 --- !u!4 &1737233908
 Transform:
   m_ObjectHideFlags: 0

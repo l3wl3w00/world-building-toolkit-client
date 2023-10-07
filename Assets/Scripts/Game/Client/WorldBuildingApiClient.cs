@@ -5,7 +5,7 @@ using System.Text;
 using Game.Client.Dto;
 using Game.Client.EndpointUtil;
 using Game.Client.Response;
-using Game.Linq;
+using Game.Util;
 using UnityEngine;
 using UnityEngine.Networking;
 
@@ -46,7 +46,7 @@ namespace Game.Client
         public IEnumerator DeleteWorld(Guid id, Action actionOnSuccess)
         {
             yield return SendDelRequest(out var request, _endpointFactory.DeleteWorld(id));
-            if (!LogAndHandleError(request)) actionOnSuccess?.Invoke();
+            if (!LogAndHandleError(request)) actionOnSuccess.Invoke();
         }
 
         public IEnumerator PatchContinent(
@@ -55,7 +55,7 @@ namespace Game.Client
             ActionOnContinentDto actionOnPatchSuccessful,
             ActionOnFail actionOnFail)
         {
-            yield return SendPatchRequest(out var request, JsonUtility.ToJson(dto),
+            yield return SendPatchRequest(out var request, dto.ToJson(),
                 _endpointFactory.PatchContinent(continentId));
             ProcessContinentPatchResponse(request, actionOnPatchSuccessful, actionOnFail);
         }
@@ -67,7 +67,7 @@ namespace Game.Client
             ActionOnContinentDto actionOnCreated,
             ActionOnFail actionOnFail)
         {
-            yield return SendPostRequest(out var request, JsonUtility.ToJson(dto),
+            yield return SendPostRequest(out var request, dto.ToJson(),
                 _endpointFactory.CreateContinent(planetId));
             ProcessContinentCreateResponse(request, actionOnCreated, actionOnFail);
         }
@@ -77,7 +77,7 @@ namespace Game.Client
             ActionOnWorldDetailed actionOnWorldDetailed,
             ActionOnFail actionOnFail)
         {
-            yield return SendPostRequest(out var request, JsonUtility.ToJson(dto),
+            yield return SendPostRequest(out var request, dto.ToJson(),
                 _endpointFactory.CreateWorld());
             ProcessWorldDetailedResponse(request, actionOnWorldDetailed);
         }
@@ -86,7 +86,7 @@ namespace Game.Client
             ActionOnWorldDetailed actionOnUpdated,
             ActionOnFail actionOnFail)
         {
-            yield return SendPatchRequest(out var request, JsonUtility.ToJson(createWorldDto),
+            yield return SendPatchRequest(out var request, createWorldDto.ToJson(),
                 _endpointFactory.UpdateWorld(worldId));
             ProcessWorldUpdatedResponse(request, actionOnUpdated, actionOnFail);
         }
@@ -100,7 +100,10 @@ namespace Game.Client
         {
             if (LogAndHandleError(request, actionOnFail)) return;
 
-            var world = JsonUtility.FromJson<WorldDetailedDto>(request.downloadHandler.text);
+            var requestBody = request.downloadHandler.text;
+            var world = WorldDetailedDto
+                .FromJson(requestBody)
+                .ExpectNotNull($"Cannot deserialize {requestBody} into {nameof(WorldDetailedDto)}");
 
             actionOnUpdated.Invoke(world);
         }
@@ -110,9 +113,11 @@ namespace Game.Client
         {
             if (LogAndHandleError(request, actionOnFail)) return;
 
-            var patchedContinent = JsonUtility.FromJson<ContinentDto>(request.downloadHandler.text);
+            var requestBody = request.downloadHandler.text;
+            var patchedContinent = ContinentDto.FromJson(requestBody)
+                .ExpectNotNull($"Cannot deserialize {requestBody} into {nameof(WorldDetailedDto)}");
 
-            actionOnPatchSuccessful?.Invoke(patchedContinent);
+            actionOnPatchSuccessful.Invoke(patchedContinent);
         }
 
         private void ProcessContinentCreateResponse(UnityWebRequest request,
@@ -120,26 +125,20 @@ namespace Game.Client
         {
             if (LogAndHandleError(request, actionOnFail)) return;
 
-            var createdContinent = JsonUtility.FromJson<ContinentDto>(request.downloadHandler.text);
+            var createdContinent = request.downloadHandler.text.ToObjectOrError<ContinentDto>();
 
-            actionOnContinentDto?.Invoke(createdContinent);
+            actionOnContinentDto.Invoke(createdContinent);
         }
 
         private void ProcessWorldDetailedResponse(UnityWebRequest request, ActionOnWorldDetailed actionOnWorldDetailed)
         {
             if (LogAndHandleError(request)) return;
-
+            
             var jsonResponse = request.downloadHandler.text;
             Debug.Log("Received JSON: " + jsonResponse);
 
-            var world = JsonUtility.FromJson<WorldDetailedDto>(jsonResponse);
-            if (world == null)
-            {
-                Debug.LogError("Deserialized item is null");
-                return;
-            }
-
-            actionOnWorldDetailed?.Invoke(world);
+            var world = jsonResponse.ToObjectOrError<WorldDetailedDto>();
+            actionOnWorldDetailed.Invoke(world);
         }
 
         private void ProcessWorldListResponse(UnityWebRequest request, ActionOnWorldSummaries actionOnWorldSummaries)
@@ -148,15 +147,9 @@ namespace Game.Client
 
             var jsonResponse = request.downloadHandler.text;
             Debug.Log("Received JSON: " + jsonResponse);
-
-            var worlds = JsonHelper.FromJson<WorldSummaryDto>(jsonResponse);
-            if (worlds == null)
-            {
-                Debug.LogError("Deserialized items are null");
-                return;
-            }
-
-            worlds.ForEach(w => actionOnWorldSummaries?.Invoke(w));
+            jsonResponse
+                .ToObjectList<WorldSummaryDto>()
+                .ForEach(actionOnWorldSummaries.Invoke);
         }
 
         #endregion
@@ -165,6 +158,7 @@ namespace Game.Client
 
         private UnityWebRequestAsyncOperation SendDelRequest(out UnityWebRequest request, string endpoint)
         {
+            Debug.Log($"Sending delete request to {endpoint}");
             request = UnityWebRequest.Delete(endpoint);
             SetAuthHeader(request);
 
@@ -174,6 +168,7 @@ namespace Game.Client
         private UnityWebRequestAsyncOperation SendPatchRequest(out UnityWebRequest request, string body,
             string endpoint)
         {
+            Debug.Log($"Sending patch request to {endpoint}\n with body \n{body}");
             request = CreateRequestWithBody(HttpMethod.Patch, body, endpoint);
             SetAuthHeader(request);
 
@@ -182,6 +177,7 @@ namespace Game.Client
 
         private UnityWebRequestAsyncOperation SendGetRequest(out UnityWebRequest request, string endpoint)
         {
+            Debug.Log($"Sending get request to {endpoint}");
             request = UnityWebRequest.Get(endpoint);
             SetAuthHeader(request);
 
@@ -190,6 +186,7 @@ namespace Game.Client
 
         private UnityWebRequestAsyncOperation SendPostRequest(out UnityWebRequest request, string body, string endpoint)
         {
+            Debug.Log($"Sending post request to {endpoint}\n with body \n{body}");
             request = CreateRequestWithBody(HttpMethod.Post, body, endpoint);
             SetAuthHeader(request);
 
@@ -200,34 +197,32 @@ namespace Game.Client
 
         #region Handle Errors
 
+        private bool LogAndHandleError(UnityWebRequest request) =>
+            LogAndHandleError(request, Option<ActionOnFail>.None);
+        
         // returns true if there was an error, and false if there was no error
-        private bool LogAndHandleError(UnityWebRequest request, ActionOnFail actionOnFail = null)
+        private bool LogAndHandleError(UnityWebRequest request, Option<ActionOnFail> actionOnFail)
         {
-            if (request.downloadHandler == null) return false;
-            var responseBody = request.downloadHandler.text;
-
-            if (IsError(request))
+            var downloadHandler = request.downloadHandler.ToOption();
+            
+            if (downloadHandler.NoValue || !IsError(request)) return false;
+            if (request.result == UnityWebRequest.Result.ConnectionError)
             {
-                if (request.result == UnityWebRequest.Result.ConnectionError)
-                {
-                    Debug.LogError("Connection Error");
-                    return true;
-                }
-
-                var errorResponse = JsonUtility.FromJson<ErrorResponse>(responseBody);
-                if (errorResponse == null)
-                {
-                    Debug.LogError(responseBody);
-                    return true;
-                }
-
-                actionOnFail?.Invoke(errorResponse);
-                Debug.LogError(request.error);
-                Debug.LogError(errorResponse.title);
+                Debug.LogError("Connection Error");
                 return true;
             }
-
-            return false;
+            
+            downloadHandler.Value.text.ToOption()
+                .ValueOr("")
+                .ToObject<ErrorResponse>()
+                .LogErrorIfNull($"Error in response. Response: {downloadHandler.Value.text}. Error: {request.error}")
+                .DoIfNotNull(err =>
+                {
+                    actionOnFail.NullableValue?.Invoke(err);
+                    err.LogError();
+                });
+            
+            return true;
         }
 
         private bool IsError(UnityWebRequest request)
@@ -255,25 +250,5 @@ namespace Game.Client
         }
 
         #endregion
-    }
-
-    public static class JsonHelper
-    {
-        public static T[] FromJson<T>(string json)
-        {
-            var newJson = "{ \"array\": " + json + "}";
-            var wrapper = JsonUtility.FromJson<Wrapper<T>>(newJson);
-            return wrapper.array;
-        }
-
-        [Serializable]
-        private sealed class Wrapper<T>
-        {
-            #region Serialized Fields
-
-            public T[] array;
-
-            #endregion
-        }
     }
 }
