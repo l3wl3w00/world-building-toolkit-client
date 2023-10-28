@@ -1,14 +1,11 @@
 #nullable enable
-using System;
+using Common.Triggers;
 using UI.Common.Button;
+using UI.Login.Command;
 
 namespace UI.Login.Button
 {
-    public class UsernameLoginButtonControl : ButtonControl<NoButtonParams>
-    {
-        protected override void OnClickedTypesafe(NoButtonParams param)
-        {
-            throw new NotImplementedException();
-        }
-    }
+
+    public class UsernameLoginButton : ButtonActionTrigger<UsernameLoginCommand>
+    { }
 }

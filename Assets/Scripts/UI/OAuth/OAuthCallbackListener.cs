@@ -4,8 +4,8 @@ using System.Net;
 using System.Threading.Tasks;
 using CodiceApp.EventTracking.Plastic;
 using Common;
-using Game.Constants;
-using Game.Util;
+using Common.Constants;
+using Common.Utils;
 using Generated;
 using UnityEngine;
 

@@ -1,14 +1,16 @@
 #nullable enable
 using System;
+using Common.Triggers;
 using UI.Common.Button;
+using UI.IntroScreen.Command;
 
 namespace UI.IntroScreen.Button
 {
-    public class RegisterButtonControl : ButtonControl<NoButtonParams>
+    public class RegisterButtonControl : ButtonActionTrigger<RegisterCommand>
     {
-        protected override void OnClickedTypesafe(NoButtonParams param)
+        private void Update()
         {
-            throw new NotImplementedException();
+            Console.WriteLine("asd");
         }
     }
 }

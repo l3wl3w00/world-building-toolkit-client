@@ -1,14 +1,11 @@
 #nullable enable
-using System;
+using Common.Triggers;
 using UI.Common.Button;
+using UI.Login.Command;
 
 namespace UI.Login.Button
 {
-    public class EmailLoginButtonControl : ButtonControl<NoButtonParams>
+    public class EmailLoginButtonControl : ButtonActionTrigger<EmailLoginCommand>
     {
-        protected override void OnClickedTypesafe(NoButtonParams param)
-        {
-            throw new NotImplementedException();
-        }
     }
 }

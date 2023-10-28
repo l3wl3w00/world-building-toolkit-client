@@ -1,15 +1,13 @@
 #nullable enable
 using Common;
-using Generated;
+using Common.ButtonBase;
+using Common.Triggers;
+using Common.Utils;
 using UI.Common.Button;
+using UI.Common.Button.SceneChange;
+using UI.MainMenu.Command;
 
 namespace UI.MainMenu.Button
 {
-    public class ListWorldsButtonControl : ButtonControl<NoButtonParams>
-    {
-        protected override void OnClickedTypesafe(NoButtonParams param)
-        {
-            Scenes.WorldListScreen.Load();
-        }
-    }
+    public class ListWorldsButton : SceneChangeButton<ListWorldsCommand> { }
 }

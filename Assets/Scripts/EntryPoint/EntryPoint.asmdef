@@ -1,0 +1,7 @@
+﻿{
+  "name": "EntryPoint",
+  "references":[ 
+    "GUID:c7552c977f34415ab7e14a9b795970a8",
+    "GUID:888edf57c518414c84d192391f03c88a" 
+  ]
+}

@@ -14,6 +14,8 @@ GameObject:
   - component: {fileID: 3578189360370821076}
   - component: {fileID: 8008841059483372612}
   - component: {fileID: 7096559366892428570}
+  - component: {fileID: 8205692826831495360}
+  - component: {fileID: 282800483777628624}
   m_Layer: 0
   m_Name: Planet
   m_TagString: Untagged
@@ -134,5 +136,32 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6a5ac0c4eacc3d246877ca237bc0d637, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  rotationSpeed: 0.5
+  continentsManager: {fileID: 0}
   continentPrefab: {fileID: 4916301958915244838, guid: 0c96d3c75b57fde419b4342a9aaa459e, type: 3}
   mainCamera: {fileID: 0}
+--- !u!114 &8205692826831495360
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8942652608911141795}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c2acce58da9f43bd86df1a9e855f6694, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  planetControl: {fileID: 0}
+--- !u!114 &282800483777628624
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8942652608911141795}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 76d68b617d5d42a7a7c22e970724283c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

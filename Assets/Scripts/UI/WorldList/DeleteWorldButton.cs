@@ -1,35 +1,28 @@
 #nullable enable
 using System;
-using Game.Client;
-using Game.Constants;
-using Game.Util;
-using UI.Common.Button;
-using UnityEditor.UI;
-using UnityEngine;
+using Client;
+using Common.Model;
+using Common.Model.Abstractions;
+using Common.Triggers;
+using Common.Utils;
+using UnityEngine.UI;
+using Zenject;
 
 namespace UI.WorldList
 {
-    public class DeleteWorldButton : ButtonControl<NoButtonParams>
+    public class DeleteWorldButton : UserControlledActionTrigger<Button>
     {
-        private Option<WorldBuildingApiClient> _client = Option<WorldBuildingApiClient>.None;
-
-        #region Properties
-
-        public Guid Id { private get; set; }
-
-        #endregion
+        [Inject] private DeleteWorldCommand _deleteWorldCommand = null!; // Asserted in OnStart
+        public IdOf<Planet> Id { private get; set; }
 
         protected override void OnStart()
         {
-            _client = new WorldBuildingApiClient(PlayerPrefs.GetString(AuthConstants.GoogleTokenKey)).ToOption();
+            NullChecker.AssertNoneIsNullInType(GetType(), _deleteWorldCommand);
         }
 
-        protected override void OnClickedTypesafe(NoButtonParams param)
+        protected override void RegisterListener(Button component)
         {
-            _client
-                .DoIfNotNull(c =>
-                    StartCoroutine(c.DeleteWorld(Id, () => Destroy(transform.parent.gameObject))))
-                .DoIfNull(() => Debug.LogError($"client was null in {this.name}"));
+            component.onClick.AddListener(() => _deleteWorldCommand.OnTriggered(new(Id, transform.parent.gameObject)));
         }
     }
 }

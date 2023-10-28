@@ -12,11 +12,12 @@ GameObject:
   - component: {fileID: 2732937969246680851}
   - component: {fileID: 2759332108583045548}
   - component: {fileID: 6997388061428769730}
+  - component: {fileID: 7329355054199186529}
   - component: {fileID: 4159353556489046213}
   - component: {fileID: 5709818960297380708}
   - component: {fileID: 8030316524070482619}
   - component: {fileID: 2607852633467409515}
-  - component: {fileID: 7329355054199186529}
+  - component: {fileID: 4099615859257824698}
   m_Layer: 0
   m_Name: Continent
   m_TagString: Untagged
@@ -67,7 +68,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 0}
+  - {fileID: 2100000, guid: 9f93d28929b5bd041bf8a7912a30bce1, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -98,8 +99,8 @@ LineRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4916301958915244838}
   m_Enabled: 1
-  m_CastShadows: 1
-  m_ReceiveShadows: 1
+  m_CastShadows: 0
+  m_ReceiveShadows: 0
   m_DynamicOccludee: 1
   m_StaticShadowCaster: 0
   m_MotionVectors: 0
@@ -191,6 +192,28 @@ LineRenderer:
   m_UseWorldSpace: 1
   m_Loop: 0
   m_ApplyActiveColorSpace: 1
+--- !u!64 &7329355054199186529
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4916301958915244838}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 5
+  m_Convex: 0
+  m_CookingOptions: 14
+  m_Mesh: {fileID: 0}
 --- !u!114 &4159353556489046213
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -239,25 +262,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7dc78dfb0c09427893588147542000e0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!64 &7329355054199186529
-MeshCollider:
+--- !u!114 &4099615859257824698
+MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4916301958915244838}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
   m_Enabled: 1
-  serializedVersion: 5
-  m_Convex: 0
-  m_CookingOptions: 14
-  m_Mesh: {fileID: 0}
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ee612abf2dd84ed4beac2810f99b95b3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

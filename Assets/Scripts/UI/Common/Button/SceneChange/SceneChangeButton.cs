@@ -1,30 +1,33 @@
 #nullable enable
 using Common;
-using Game.SceneChange;
+using Common.ButtonBase;
+using Common.SceneChange;
+using Common.Triggers;
+using Common.Triggers.GameController;
+using Common.Utils;
 using Generated;
+using UnityEngine;
 
 namespace UI.Common.Button.SceneChange
 {
-    public abstract class SceneChangeButton : ButtonControl<NoButtonParams>
+    public abstract class SceneChangeButton<TCommand> : ButtonActionTrigger<TCommand>
+        where TCommand : SceneChangeCommand
+    {}
+
+    public abstract class SceneChangeCommand : ActionListenerMono<NoActionParam>
     {
-        protected override void OnClickedTypesafe(NoButtonParams param)
+        public override void OnTriggered(NoActionParam param)
         {
-            if (DropParameters) ISceneChangeParameters.Instance.Destroy();
+            SceneChangeParameters.Instance.DoIfNotNull(i => i.Destroy());
             var parameters = new SceneParametersBuilder();
             ConfigureParameters(parameters);
             parameters.Save();
             Scene.Load();
         }
-
+        
         protected virtual void ConfigureParameters(SceneParametersBuilder parameterBuilder)
         {
         }
-
-        #region Properties
-
         protected abstract Scenes Scene { get; }
-        protected virtual bool DropParameters { get; } = true;
-
-        #endregion
     }
 }

@@ -1,11 +1,18 @@
 #nullable enable
 using System;
-using Game.Client;
-using Game.Client.Dto;
-using Game.Constants;
-using Game.Util;
+using Client;
+using Client.Dto;
+using Client.Request;
+using Client.Response;
+using Common;
+using Common.Constants;
+using Common.Model;
+using Common.Model.Abstractions;
+using Common.Utils;
+using Generated;
 using UnityEngine;
 using UnityEngine.Serialization;
+using Zenject;
 
 namespace UI.WorldList
 {
@@ -18,6 +25,7 @@ namespace UI.WorldList
 
         #endregion
 
+        [Inject] private DiContainer _container = null!; // asserted in Awake
         private Option<WorldBuildingApiClient> _client = Option<WorldBuildingApiClient>.None;
 
         #region Event Functions
@@ -25,16 +33,33 @@ namespace UI.WorldList
         private void Awake()
         {
             _client = new WorldBuildingApiClient(PlayerPrefs.GetString(AuthConstants.GoogleTokenKey)).ToOption();
-            StartCoroutine(_client.Value.GetWorlds(CreateItemUI));
-            NullChecker.AssertNoneIsNullInType(GetType(),contentTransform, uiItemPrefab);
+            NullChecker.AssertNoneIsNullInType(GetType(),contentTransform, uiItemPrefab, _container);
+            var processingStrategy = new WorldListResponseProcessor(contentTransform, uiItemPrefab, _container);
+            _client.Value.GetWorlds(processingStrategy).StartCoroutine(this);
         }
 
         #endregion
 
-        private void CreateItemUI(WorldSummaryDto world)
+
+        private record WorldListResponseProcessor(
+                Transform contentTransform, 
+                GameObject uiItemPrefab, DiContainer container) 
+            : IResponseProcessStrategy<WorldSummaryDtos>
         {
-            var initializer = Instantiate(uiItemPrefab, contentTransform).GetComponent<WorldUiItemInitializer>();
-            initializer.Initialize(world.Name, world.Id);
+            public void OnSuccess(WorldSummaryDtos responseDto)
+            {
+                foreach (var worldSummaryDto in responseDto.value)
+                {
+                    var initializer = container.InstantiatePrefabForComponent<WorldUiItemInitializer>(uiItemPrefab, contentTransform);
+                    initializer.Initialize(worldSummaryDto.Name, worldSummaryDto.Id.ToTypesafe<Planet>());
+                }
+
+            }
+
+            public void OnFail(ErrorResponse error)
+            {
+                
+            }
         }
     }
 }
