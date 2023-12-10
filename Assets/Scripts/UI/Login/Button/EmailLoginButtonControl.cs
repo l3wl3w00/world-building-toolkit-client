@@ -5,7 +5,7 @@ using UI.Login.Command;
 
 namespace UI.Login.Button
 {
-    public class EmailLoginButtonControl : ButtonActionTrigger<EmailLoginCommand>
+    public class EmailLoginButtonControl : ButtonActionTrigger<ToEmailLoginSceneCommand>
     {
     }
 }

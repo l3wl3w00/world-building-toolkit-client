@@ -6,7 +6,7 @@ using Common.Model;
 using Common.Model.Abstractions;
 using Common.Utils;
 using Game.Common;
-using Generated;
+using Common.Generated;
 using UnityEngine;
 
 namespace Game.Continent_

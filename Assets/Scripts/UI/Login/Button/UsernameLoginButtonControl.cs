@@ -6,6 +6,6 @@ using UI.Login.Command;
 namespace UI.Login.Button
 {
 
-    public class UsernameLoginButton : ButtonActionTrigger<UsernameLoginCommand>
+    public class UsernameLoginButton : ButtonActionTrigger<ToUsernameLoginCommand>
     { }
 }

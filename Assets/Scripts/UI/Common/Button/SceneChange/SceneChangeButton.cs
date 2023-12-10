@@ -1,11 +1,11 @@
 #nullable enable
 using Common;
 using Common.ButtonBase;
+using Common.Generated;
 using Common.SceneChange;
 using Common.Triggers;
 using Common.Triggers.GameController;
 using Common.Utils;
-using Generated;
 using UnityEngine;
 
 namespace UI.Common.Button.SceneChange
@@ -18,7 +18,7 @@ namespace UI.Common.Button.SceneChange
     {
         public override void OnTriggered(NoActionParam param)
         {
-            SceneChangeParameters.Instance.DoIfNotNull(i => i.Destroy());
+            SceneChangeParameters.FindInScene().DoIfNotNull(i => i.Destroy());
             var parameters = new SceneParametersBuilder();
             ConfigureParameters(parameters);
             parameters.Save();
@@ -28,6 +28,6 @@ namespace UI.Common.Button.SceneChange
         protected virtual void ConfigureParameters(SceneParametersBuilder parameterBuilder)
         {
         }
-        protected abstract Scenes Scene { get; }
+        protected abstract Scene Scene { get; }
     }
 }

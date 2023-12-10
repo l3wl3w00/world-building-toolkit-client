@@ -6,7 +6,7 @@ using Common.Geometry.Sphere;
 using Common.Model;
 using Common.Utils;
 using Game.Common;
-using Generated;
+using Common.Generated;
 using ProceduralToolkit;
 using UnityEngine;
 using UnityEngine.Events;
@@ -60,6 +60,10 @@ namespace Game.Continent_
                 color = new Color(0.15f,0.5f,0.9f);
             }
             PartialSphereMeshHandler.UpdateMesh(draft.ToMesh(), color);
+        }
+        public void UpdateMeshCollider(MeshDraft draft)
+        {
+            PartialSphereMeshHandler.UpdateMeshCollider(draft.ToMesh());
         }
     }
 

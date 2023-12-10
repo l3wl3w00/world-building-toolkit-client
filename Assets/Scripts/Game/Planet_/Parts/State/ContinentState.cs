@@ -38,14 +38,6 @@ namespace Game.Planet_.Parts.State
 
         TResult OnStateNotT(IContinentState state);
     }
-    
-    public interface IContinentStateOperation<in TState> where TState : IContinentState
-    {
-        void Apply(TState state);
-
-        void OnStateNotT(IContinentState state);
-    }
-
 
 
     public interface IContinentState
@@ -89,16 +81,6 @@ namespace Game.Planet_.Parts.State
                 return operation.Apply(thisAsT);
             }
             return operation.OnStateNotT(this);
-        }
-        
-        void Interact<TState>(IContinentStateOperation<TState> operation)
-            where TState : IContinentState
-        {
-            if (this is TState thisAsT)
-            {
-                operation.Apply(thisAsT);
-            }
-            operation.OnStateNotT(this);
         }
     }
     

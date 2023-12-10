@@ -8,5 +8,5 @@ using UI.IntroScreen.Command;
 
 namespace UI.IntroScreen.Button
 {
-    public class LoginButtonControl : SceneChangeButton<LoginCommand> { }
+    public class LoginButtonControl : SceneChangeButton<ToLoginSceneCommand> { }
 }

@@ -68,6 +68,18 @@ namespace Client.Mapper
                 Description: dto.Description,
                 FirstYear: dto.FirstYear,
                 YearPhases: dto.YearPhases);
+        
+        public static HistoricalEvent ToModel(this HistoricalEventDto dto) =>
+            new
+            (
+                Id: dto.Id.ToTypesafe<HistoricalEvent>(),
+                Region: dto.RegionId.ToTypesafe<Region>(),
+                Name: dto.Name,
+                Description: dto.Description,
+                DefaultCalendar: dto.DefaultCalendarId.ToTypesafe<Calendar>(),
+                Beginning: dto.RelativeStart,
+                End: dto.RelativeEnd
+            );
 
         public static Planet ToModel(this WorldDetailedDto dto) =>
             new 
@@ -76,7 +88,8 @@ namespace Client.Mapper
                 Name: dto.Name, 
                 Description: dto.Description,
                 AntiLandColor: dto.AntiLandColor.ToUnityColor(),
-                LandColor: dto.LandColor.ToUnityColor()
+                LandColor: dto.LandColor.ToUnityColor(),
+                DayLength: dto.DayLength
             );
 
 
@@ -102,6 +115,11 @@ namespace Client.Mapper
             byte ToDomainColorSpace(float value) => (byte) Mathf.RoundToInt(value * 255);
         }
         public static ICollection<Region> ToModels(this IEnumerable<RegionDto> dtos)
+        {
+            return dtos.Select(d => d.ToModel()).ToHashSet();
+        }
+        
+        public static ICollection<HistoricalEvent> ToModels(this IEnumerable<HistoricalEventDto> dtos)
         {
             return dtos.Select(d => d.ToModel()).ToHashSet();
         }

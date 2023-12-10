@@ -10,52 +10,6 @@ using UnityEngine;
 
 namespace Client.Request
 {
-    // public abstract class WorldBuildingApiRequestFactory<TRequestDto, TResponseDto>
-    //     where TRequestDto : JsonSerializable<TRequestDto>
-    //     where TResponseDto : JsonSerializable<TResponseDto>
-    // {
-    //     private const string BaseUrl = "https://localhost:44366/";
-    //     protected WorldBuildingApiEndpoint MakeEndpoint(string path) => new(BaseUrl + path);
-    //     protected virtual string Token => PlayerPrefs.GetString(AuthConstants.GoogleTokenKey);
-    //     protected abstract WorldBuildingApiEndpoint Endpoint { get;}
-    //     protected abstract IResponseProcessStrategy<TResponseDto> ResponseProcessStrategy { get;}
-    //     protected abstract TRequestDto RequestBody { get;}
-    //     protected abstract HttpMethod Method { get;}
-    //
-    //     public IEnumerator SendRequest()
-    //     {
-    //         return new WorldBuilderRequest<TRequestDto, TResponseDto>(
-    //             Method,
-    //             Endpoint,
-    //             Token,
-    //             ResponseProcessStrategy,
-    //             RequestBody)
-    //             .Send();
-    //     }
-    // }
-    //
-    // public abstract class GetRequest<TResponseDto> 
-    //     : WorldBuildingApiRequestFactory<NoRequestBody, TResponseDto>
-    //     where TResponseDto : JsonSerializable<TResponseDto>
-    // {
-    //     protected override NoRequestBody RequestBody => new();
-    //     protected override HttpMethod Method => HttpMethod.Get;
-    // }
-    //
-    // public class GetWorldRequest : GetRequest<WorldDetailedDto>
-    // {
-    //     private readonly IdOf<Planet> _planetId;
-    //
-    //     public GetWorldRequest(IdOf<Planet> planetId, IResponseProcessStrategy<WorldDetailedDto> responseProcessStrategy)
-    //     {
-    //         _planetId = planetId;
-    //         ResponseProcessStrategy = responseProcessStrategy;
-    //     }
-    //
-    //     protected override WorldBuildingApiEndpoint Endpoint => MakeEndpoint($"planet/{_planetId.Value.ToString()}");
-    //     protected override IResponseProcessStrategy<WorldDetailedDto> ResponseProcessStrategy { get; }
-    // }
-
     public class WorldBuildingApiClient
     {
         private readonly EndpointFactory _endpointFactory = new();

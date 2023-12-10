@@ -62,7 +62,7 @@ namespace InGameUi
         private void UpdateInputFields()
         {
             Debug.Log("Update input fields");
-            _hudMap[planetMono.State].GetComponentsInChildren<IInputFiller>().ForEach(t => t.UpdateValue());
+            _hudMap[planetMono.State].GetComponentsInChildren<IStateObserver>().ForEach(t => t.UpdateValue());
         }
         
 

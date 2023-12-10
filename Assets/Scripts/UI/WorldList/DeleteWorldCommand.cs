@@ -45,3 +45,8 @@ namespace UI.WorldList
         public record Params(IdOf<Planet> planetToDelete, GameObject uiItemToDelete) : IActionParam;
     }
 }
+
+namespace System.Runtime.CompilerServices
+{
+    public class IsExternalInit { }
+}

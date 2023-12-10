@@ -1,11 +1,11 @@
 ﻿#nullable enable
 using Common.ButtonBase;
+using Common.Generated;
 using Common.SceneChange;
 using Common.Triggers;
 using Common.Triggers.GameController;
 using Common.Utils;
 using GameController;
-using Generated;
 
 namespace InGameUi.Button
 {
@@ -14,8 +14,8 @@ namespace InGameUi.Button
     {
         public override void OnTriggered(NoActionParam param)
         {
-            SceneChangeParameters.Instance.DoIfNotNull(i => i.Destroy());
-            Scenes.WorldListScreen.Load();
+            SceneChangeParameters.FindInScene().DoIfNotNull(i => i.Destroy());
+            Scene.WorldListScreen.Load();
         }
     }
 }

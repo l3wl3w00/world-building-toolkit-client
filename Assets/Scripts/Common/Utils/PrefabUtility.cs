@@ -1,7 +1,7 @@
 ﻿#nullable enable
 using System.Collections.Generic;
-using Generated;
 using UnityEngine;
+using Prefab = Common.Generated.Prefab;
 
 namespace Common.Utils
 {
@@ -14,10 +14,11 @@ namespace Common.Utils
             var prefabGameObject = _loadedPrefabs.GetValueOrDefault(prefab).ToOption();
             if (prefabGameObject.HasValue) return prefabGameObject.Value;
 
-            var newlyLoadedPrefab = Resources.Load<GameObject>(prefab.Name).ToOption();
-            newlyLoadedPrefab
-                .DoIfNull(() => Debug.LogError($"Failed to load prefab {prefab.Name}!"))
+            var newlyLoadedPrefab = Resources.Load<GameObject>(prefab.Path)
+                .ToOption()
+                .DoIfNull(() => Debug.LogError($"Failed to load prefab {prefab.Path}!"))
                 .DoIfNotNull(gameObject => _loadedPrefabs.Add(prefab, gameObject));
+            
             return newlyLoadedPrefab.Value;
         }
     }
@@ -35,6 +36,14 @@ namespace Common.Utils
         public static GameObject Instantiate(this Prefab prefabName)
         {
             return Instantiate(prefabName, Option<Transform>.None);
+        }
+        
+        public static T InstantiateAndExpectComponent<T>(this Prefab prefabName)
+            where T : Component
+        {
+            return Instantiate(prefabName, Option<Transform>.None).GetComponent<T>()
+                .ToOption()
+                .ExpectNotNull($"Component {typeof(T).Name} was expected to be on prefab '{prefabName.Name}', but it was not present");
         }
         public static GameObject Instantiate(this Prefab prefabName, Option<Transform> parent)
         {

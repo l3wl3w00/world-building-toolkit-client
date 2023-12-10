@@ -1,7 +1,7 @@
 #nullable enable
 using Common;
+using Common.Generated;
 using Common.Utils;
-using Generated;
 using UnityEngine;
 
 namespace UI.WorldList

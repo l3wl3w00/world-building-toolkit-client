@@ -30,6 +30,10 @@ namespace Game.Common
             material.color = color;
             material.renderQueue = (int) RenderQueue.Transparent;
             MeshFilter.mesh = mesh;
+        }
+        
+        public void UpdateMeshCollider(Mesh mesh)
+        {
             MeshCollider.sharedMesh = mesh;
         }
         

@@ -1,18 +1,19 @@
 #nullable enable
 using System;
 using Common;
+using Common.Generated;
 using Common.Geometry.Sphere;
 using Common.Model;
+using Common.Model.Abstractions;
 using Common.Utils;
 using Game.Common;
+using Game.Common.Holder;
 using Game.Continent_;
-using Generated;
 using ProceduralToolkit;
 using UnityEngine;
 
 namespace Game.Region_
 {
-    // methods
     public partial class RegionMonoBehaviour : BoundedLocationMono
     {
         private void OnMouseDown() => _clickedListener.OnMouseDownOverRegion(this);
@@ -25,13 +26,11 @@ namespace Game.Region_
         {
             PartialSphereMeshHandler.UpdateMesh(draft.ToMesh(), Region.Color);
         }
-        
-        
-        public void OnColorChanged(Color color)
+        public void UpdateMeshCollider(MeshDraft draft)
         {
-            Region = Region with { Color = color };
-            UpdateColor();
+            PartialSphereMeshHandler.UpdateMeshCollider(draft.ToMesh());
         }
+        
 
         public void UpdateColor()
         {
@@ -63,14 +62,14 @@ namespace Game.Region_
         RegionMonoBehaviour>
     {
         private record RegionProvider() : PrefabProvider(Prefab.Region);
-        public record CreateParams(ISphere sphere, Region region, IRegionClickedListener clickedListener) : CreateParamsFlag;
+        public record CreateParams(ISphere sphere, Ref<Region> regionRef, IRegionClickedListener clickedListener) : CreateParamsFlag;
 
         public static RegionMonoBehaviour Create(CreateParams p) =>
             IGameObjectFactoryMethod<CreateParams, RegionProvider, RegionMonoBehaviour>.Create(p, p.sphere.Transform);
         public void Initialize(CreateParams createParams)
         {
-            Region = createParams.region;
             _clickedListener = createParams.clickedListener;
+            RegionModelRefHolder.Value = createParams.regionRef;
             SphereControlPointsHandler.Initialize(Region.GlobalBounds, createParams.sphere);
             SphereLineRendererHandler.Initialize(createParams.sphere);
             MeshRenderer.material.color = Region.Color;
@@ -83,19 +82,19 @@ namespace Game.Region_
     {
         private static long _continentCounter;
         private IRegionClickedListener _clickedListener = null!; // Asserted in Start
-        private Option<RegionModelHolder> _regionModelHolder = Option<RegionModelHolder>.None;
+        private Option<RegionModelRefHolder> _regionModelRefHolder = Option<RegionModelRefHolder>.None;
         private Option<MeshRenderer> _meshRenderer = Option<MeshRenderer>.None;
         private float _multiplier = 1f;
         private float _addition = 0f;
 
         public bool Inverted => Region.Inverted;
-        private RegionModelHolder RegionModelHolder => this.LazyInitialize(ref _regionModelHolder);
+        private RegionModelRefHolder RegionModelRefHolder => this.LazyInitialize(ref _regionModelRefHolder);
         private MeshRenderer MeshRenderer => this.LazyInitialize(ref _meshRenderer);
-        public Region Region
-        {
-            get => RegionModelHolder.Value;
-            set => RegionModelHolder.Value = value;
-        }
+        public Region Region => RegionModelRefHolder.Value.Get();
+
+        public IdOf<Region> RegionId => RegionModelRefHolder.Value.Id;
+        public Ref<Region> RegionRef => RegionModelRefHolder.Value;
+
     }
     
     public interface IRegionClickedListener

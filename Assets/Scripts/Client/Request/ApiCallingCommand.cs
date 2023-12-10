@@ -1,10 +1,13 @@
 #nullable enable
 using System;
+using System.Globalization;
 using Client.Dto;
 using Client.EndpointUtil;
+using Client.Response;
 using Common;
 using Common.ButtonBase;
 using Common.Constants;
+using Common.Model.Abstractions;
 using Common.Triggers.GameController;
 using UnityEngine;
 
@@ -25,10 +28,12 @@ namespace Client.Request
             OnStart();
         }
 
-        public override void OnTriggered(TParams param)
+        public sealed override void OnTriggered(TParams param)
         {
+            Debug.Log($"Triggered {GetType().FullName}");
             var endpoint = GetEndpoint(new EndpointFactory(), param);
             var responseProcessStrategy = GetResponseProcessStrategy(param);
+            BeforeRequestIsSent();
             var requestDto = GetRequestDto(param);
             _client.ExpectNotNull(nameof(_client), (Action<TParams>)OnTriggered)
                 .CreateRequestWithBody(Method, endpoint, responseProcessStrategy, requestDto)
@@ -45,6 +50,11 @@ namespace Client.Request
         {
             
         }
+        
+        protected virtual void BeforeRequestIsSent()
+        {
+            
+        }
     }
     
     public abstract class GetApiCallingCommand<TButtonParams, TResponseDto>
@@ -52,15 +62,25 @@ namespace Client.Request
         where TButtonParams : IActionParam
         where TResponseDto : JsonSerializable<TResponseDto>
     {
-        protected override NoRequestBody GetRequestDto(TButtonParams buttonParams) => new();
-        protected override HttpMethod Method => HttpMethod.Get;
+        protected sealed override NoRequestBody GetRequestDto(TButtonParams buttonParams) => new();
+        protected sealed override HttpMethod Method => HttpMethod.Get;
     }
     
     public abstract class DelApiCallingCommand<TButtonParams> : ApiCallingCommand<TButtonParams,NoRequestBody,NoResponseBody>
         where TButtonParams : IActionParam 
     {
-        protected override NoRequestBody GetRequestDto(TButtonParams buttonParams) => new();
-        protected override HttpMethod Method => HttpMethod.Delete;
+        protected sealed override NoRequestBody GetRequestDto(TButtonParams buttonParams) => new();
+        protected sealed override HttpMethod Method => HttpMethod.Delete;
+    }
+    
+    public abstract class DelApiCallingCommandAndResponseStrategy<TButtonParams> : DelApiCallingCommand<TButtonParams>, IResponseProcessStrategy<NoResponseBody>
+        where TButtonParams : IActionParam 
+    {
+        protected sealed override IResponseProcessStrategy<NoResponseBody> 
+            GetResponseProcessStrategy(TButtonParams buttonParams) => this;
+
+        public abstract void OnSuccess(NoResponseBody responseDto);
+        public abstract void OnFail(ErrorResponse error);
     }
     
     public abstract class PostApiCallingCommand<TParams, TRequestDto, TResponseDto> : ApiCallingCommand<TParams,TRequestDto,TResponseDto>
@@ -68,7 +88,7 @@ namespace Client.Request
         where TRequestDto : JsonSerializable<TRequestDto>
         where TResponseDto : JsonSerializable<TResponseDto>
     {
-        protected override HttpMethod Method => HttpMethod.Post;
+        protected sealed override HttpMethod Method => HttpMethod.Post;
     }
     
     public abstract class PatchApiCallingCommand<TParams, TRequestDto, TResponseDto> : ApiCallingCommand<TParams,TRequestDto,TResponseDto>
@@ -76,7 +96,7 @@ namespace Client.Request
         where TRequestDto : JsonSerializable<TRequestDto>
         where TResponseDto : JsonSerializable<TResponseDto>
     {
-        protected override HttpMethod Method => HttpMethod.Patch;
+        protected sealed override HttpMethod Method => HttpMethod.Patch;
     }
     
     public abstract class PutApiCallingCommand<TParams, TRequestDto, TResponseDto> : ApiCallingCommand<TParams,TRequestDto,TResponseDto>
@@ -84,6 +104,6 @@ namespace Client.Request
         where TRequestDto : JsonSerializable<TRequestDto>
         where TResponseDto : JsonSerializable<TResponseDto>
     {
-        protected override HttpMethod Method => HttpMethod.Put;
+        protected sealed override HttpMethod Method => HttpMethod.Put;
     }
 }

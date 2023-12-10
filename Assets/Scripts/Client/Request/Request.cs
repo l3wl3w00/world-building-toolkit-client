@@ -20,11 +20,11 @@ namespace Client.Request
     {
         public IEnumerator Send();
     }
-    public interface IResponseProcessStrategy<in TResponseDto>
+    public interface IResponseProcessStrategy<in TResponseDto> 
         where TResponseDto : JsonSerializable<TResponseDto>
     {
-        public void OnSuccess(TResponseDto responseDto);
-        public void OnFail(ErrorResponse error);
+        void OnSuccess(TResponseDto responseDto);
+        void OnFail(ErrorResponse error);
     }
     
     internal record WorldBuilderRequest<TRequestDto, TResponseDto> : IWorldBuilderRequest
@@ -92,7 +92,7 @@ namespace Client.Request
 
             var downloadHandler = downloadHandlerOpt.ExpectNotNull(
                 $"Unsuccessful response has no body, but is expected to have body of type {nameof(ErrorResponse)}");
-
+            Debug.LogError($"Response Failed: {downloadHandler.text}");
             var error = downloadHandler.text.ToObjectOrError<ErrorResponse>();
             Debug.LogError("Error Response: " + downloadHandler.text);
             error.LogError();

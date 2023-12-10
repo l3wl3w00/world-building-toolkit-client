@@ -1,6 +1,6 @@
 ﻿using Common;
+using Common.Generated;
 using Common.Utils;
-using Generated;
 
 namespace WorldBuilder.Client.Editor
 {
@@ -41,7 +41,7 @@ namespace WorldBuilder.Client.Editor
 
             if (state == PlayModeStateChange.EnteredPlayMode)
             {
-                Scenes.Initial.Load();
+                Common.Generated.Scene.Initial.Load();
             }
 
             if (state == PlayModeStateChange.EnteredEditMode)

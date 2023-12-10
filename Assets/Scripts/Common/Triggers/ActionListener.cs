@@ -9,12 +9,12 @@ namespace Common.Triggers
     {
         public interface IActionListener { }
 
-        public interface IControlActionListener<in TParam> : IActionListener
+        public interface IActionListener<in TParam> : IActionListener
             where TParam : IActionParam
         {
             void OnTriggered(TParam param);
         }
-        public abstract class ActionListenerMono<TParam> : MonoBehaviour, IControlActionListener<TParam>
+        public abstract class ActionListenerMono<TParam> : MonoBehaviour, IActionListener<TParam>
             where TParam : IActionParam
         {
             public abstract void OnTriggered(TParam param);

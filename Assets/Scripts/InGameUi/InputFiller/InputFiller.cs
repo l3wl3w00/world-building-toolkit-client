@@ -12,13 +12,12 @@ using Toggle = UnityEngine.UI.Toggle;
 
 namespace InGameUi.InputFiller
 {
-    public interface IInputFiller
-        // : IInjectable<PlanetMonoBehaviour>
+    public interface IStateObserver
     {
-        public void UpdateValue();
+        void UpdateValue();
     }
 
-    public abstract class InputFiller<TComponent, TValue, TQuery> : MonoBehaviour, IInputFiller
+    public abstract class InputFiller<TComponent, TValue, TQuery> : MonoBehaviour, IStateObserver
         where TComponent : Component
         where TValue : notnull
         where TQuery : IQuery<TValue>
@@ -28,11 +27,6 @@ namespace InGameUi.InputFiller
         [Inject]
         private void Construct(TQuery query)
         {
-            if (typeof(TQuery) == typeof(ModelCollectionQuery<Calendar>))
-            {
-                
-            }
-
             _query = query;
         }
         protected void Start()
@@ -46,13 +40,13 @@ namespace InGameUi.InputFiller
             
         }
         
-        private Option<TValue> GetValue() => _query.Get().ToOption();
+        private Option<TValue> GetValue() => _query.Get();
 
         public void UpdateValue()
         {
             GetComponent<TComponent>().ToOption()
                 .DoIfNull(() => Debug.LogError($"{GetType().Name} was put on {name}, " +
-                                               $"which has no {nameof(TComponent)} component"))
+                                               $"which has no '{typeof(TComponent).Name}' component"))
                 .DoIfNotNull(SetValueIfNotNull);
             return;
 
@@ -68,60 +62,8 @@ namespace InGameUi.InputFiller
         
         protected abstract void SetValue(TComponent component, TValue value);
     }
-
-    public abstract class InputFiller<TComponent, TValue, TQueryParam, TQuery> : MonoBehaviour, IInputFiller
-        where TComponent : Component
-        where TValue : notnull
-        where TQuery : IQuery<TQueryParam,TValue>
-    {
-        private TQuery _query = default!; //Asserted in Start
-        
-        [Inject]
-        private void Construct(TQuery query)
-        {
-            if (typeof(TQuery) == typeof(GetCalendarById))
-            {
-                
-            }
-
-            _query = query;
-        }
-        protected void Start()
-        {
-            NullChecker.AssertNoneIsNullInType(GetType(), _query);
-            OnStart();
-        }
-        
-        protected virtual void OnStart()
-        {
-            
-        }
-
-        protected abstract TQueryParam GetQueryParam(TComponent component);
-        private Option<TValue> GetValue(TComponent component) => _query.Get(GetQueryParam(component)).ToOption();
-
-        public void UpdateValue()
-        {
-            GetComponent<TComponent>().ToOption()
-                .DoIfNull(() => Debug.LogError($"{GetType().Name} was put on {name}, " +
-                                               $"which has no {typeof(TComponent).Name} component", gameObject))
-                .DoIfNotNull(SetValueIfNotNull);
-            return;
-
-            void SetValueIfNotNull(TComponent component)
-            {
-                GetValue(component).DoIfNotNull(v =>
-                {
-                    Debug.Log($"Updating {name}. new value: {v}");
-                    SetValue(component, v);
-                });
-            }
-        }
-        
-        protected abstract void SetValue(TComponent component, TValue value);
-    }
     
-    public abstract class InputFiller<TComponent, TValue> : MonoBehaviour, IInputFiller
+    public abstract class InputFiller<TComponent, TValue> : MonoBehaviour, IStateObserver
         where TComponent : Component
         where TValue : notnull
     {
@@ -157,44 +99,22 @@ namespace InGameUi.InputFiller
         
         protected abstract void SetValue(TComponent component, TValue value);
     }
-    public abstract class GameObjectInputFiller<TValue, TQueryParam, TQuery> : MonoBehaviour, IInputFiller
-        where TValue : notnull
-        where TQuery : IQuery<TQueryParam,TValue>
-    {
-        [Inject] private TQuery _query = default!; //Asserted in Start
 
-        protected void Start()
-        {
-            NullChecker.AssertNoneIsNullInType(GetType(), _query);
-            OnStart();
-        }
-        
-        protected virtual void OnStart()
-        {
-            
-        }
-
-        protected abstract TQueryParam QueryParam { get; }
-        private Option<TValue> GetValue() => _query.Get(QueryParam).ToOption();
-
-        public void UpdateValue()
-        {
-            GetValue().DoIfNotNull(v =>
-            {
-                Debug.Log($"Updating {name}. new value: {v}");
-                SetValue(gameObject, v);
-            });
-        }
-        
-        protected abstract void SetValue(GameObject gameObjectParam, TValue value);
-    }
-    
     public class TextInputFiller<TQuery> : InputFiller<TMP_InputField, string, TQuery> 
         where TQuery : IQuery<string>
     {
         protected override void SetValue(TMP_InputField component, string value)
         {
             component.text = value;
+        }
+    }
+
+    public class TextOptInputFiller<TQuery> : InputFiller<TMP_InputField, Option<string>, TQuery> 
+        where TQuery : IQuery<Option<string>>
+    {
+        protected override void SetValue(TMP_InputField component, Option<string> value)
+        {
+            value.DoIfNotNull(v => component.text = v);
         }
     }
 
@@ -206,7 +126,7 @@ namespace InGameUi.InputFiller
             component.isOn = value;
         }
     }
-    
+
     public abstract class ColorPickerInputFiller<TQuery> : InputFiller<FlexibleColorPicker, Color, TQuery>
         where TQuery : IQuery<Color>
     {
@@ -215,13 +135,32 @@ namespace InGameUi.InputFiller
             component.SetColorWithNoEvent(value);
         }
     }
-    
-    public abstract class DropdownInputFiller<TQuery> : InputFiller<Dropdown, int, TQuery>
+
+    public abstract class DropdownInputFiller<TQuery> : InputFiller<TMP_Dropdown, int, TQuery>
         where TQuery : IQuery<int>
     {
-        protected override void SetValue(Dropdown component, int value)
+        protected override void SetValue(TMP_Dropdown component, int value)
         {
             component.value = value;
+        }
+    }
+
+    public static class InputFillerUtils
+    {
+        public static void UpdateChildInputFillers<T>(this T t) where T : Component
+        {
+            foreach (var i in t.GetComponentsInChildren<IStateObserver>())
+            {
+                i.UpdateValue();
+            }
+        }
+        
+        public static void UpdateChildInputFillers(this GameObject g)
+        {
+            foreach (var i in g.GetComponentsInChildren<IStateObserver>())
+            {
+                i.UpdateValue();
+            }
         }
     }
 }

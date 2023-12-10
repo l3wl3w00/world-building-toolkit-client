@@ -2,8 +2,8 @@
 using System;
 using Common;
 using Common.Constants;
+using Common.Generated;
 using Common.Utils;
-using Generated;
 using UnityEngine;
 
 namespace EntryPoint
@@ -21,7 +21,7 @@ namespace EntryPoint
                                   PlayerPrefs.HasKey(AuthConstants.GoogleTokenSaveDateKey));
             if (anyKeyMissing)
             {
-                Scenes.UnauthorizedScreen.Load();
+                Scene.UnauthorizedScreen.Load();
                 return;
             }
 
@@ -35,11 +35,11 @@ namespace EntryPoint
             var isExpired = _timeProvider.Now >= saveDate.AddSeconds(expiration - secondsOverHead);
             if (isExpired)
             {
-                Scenes.UnauthorizedScreen.Load();
+                Scene.UnauthorizedScreen.Load();
                 return;
             }
 
-            Scenes.MainMenuScreen.Load();
+            Scene.MainMenuScreen.Load();
         }
 
         #endregion

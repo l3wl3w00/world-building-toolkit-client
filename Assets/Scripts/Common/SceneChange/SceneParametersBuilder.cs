@@ -2,9 +2,9 @@
 using System;
 using System.Collections.Generic;
 using Common.Utils;
-using Generated;
 using Unity.VisualScripting;
 using Object = UnityEngine.Object;
+using Prefab = Common.Generated.Prefab;
 
 namespace Common.SceneChange
 {
@@ -36,7 +36,8 @@ namespace Common.SceneChange
                 .DoIfNotNull(AddValuesTo)
                 .DoIfNull(() =>
                 {
-                    var parameters = Prefab.SceneChangeParameters.Instantiate().GetComponent<SceneChangeParameters>();
+                    var parameters =
+                        Prefab.SceneChangeParameters.InstantiateAndExpectComponent<SceneChangeParameters>();
                     AddValuesTo(parameters);
                     Object.DontDestroyOnLoad(parameters);
                 });

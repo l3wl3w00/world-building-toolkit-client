@@ -7,13 +7,17 @@ using Zenject;
 
 namespace GameController.Commands
 {
-    public record CreatePlanetCommandParams(Planet planet, ICollection<Continent> continents, ICollection<Calendar> calendars) : IActionParam;
-    public class CreatePlanetCommand : StateDependantCommand<CreatePlanetCommandParams,CreatePlanetState>
+    public record CreatePlanetCommandParams(
+        Planet planet,
+        ICollection<Continent> continents,
+        ICollection<Calendar> calendars,
+        List<HistoricalEvent> events) : IActionParam;
+    public class CreatePlanetCommand : StateDependantCommand<CreatePlanetCommandParams,PlanetInCreationState>
     {
         [Inject] private ModelCollection<Calendar> _calendars;
-        protected override Unit Apply(CreatePlanetState state, CreatePlanetCommandParams param)
+        protected override Unit Apply(PlanetInCreationState inCreationState, CreatePlanetCommandParams param)
         {
-            var initializeParams = new PlanetWithRelatedEntities(param.planet, param.continents, param.calendars);
+            var initializeParams = new PlanetWithRelatedEntities(param.planet, param.continents, param.calendars, param.events);
             PlanetMono.Planet = param.planet;
             PlanetMono.ToEditPlanetStateInitially(initializeParams);
             _calendars.Add(param.calendars);

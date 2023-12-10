@@ -1,7 +1,8 @@
 ﻿#nullable enable
 using Common;
+using Common.Generated;
 using Common.Utils;
-using Generated;
+using Common.Generated;
 using UnityEngine;
 
 namespace Game.Common
@@ -20,7 +21,7 @@ namespace Game.Common
             var mono = prefab
                 .Instantiate(transformParent.ToOption())
                 .GetComponent<TExactType>().ToOption()
-                .ExpectNotNull($"Prefab {prefab.Name} does not contain component {nameof(TExactType)}, but is expected to");
+                .ExpectNotNull($"Prefab {prefab.Path} does not contain component {nameof(TExactType)}, but is expected to");
             mono.Initialize(createParams);
             return mono;
         }

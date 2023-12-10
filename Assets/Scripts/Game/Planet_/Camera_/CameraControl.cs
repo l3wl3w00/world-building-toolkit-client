@@ -1,6 +1,8 @@
 #nullable enable
 using Common.Utils;
+using Game.Planet_.Parts;
 using UnityEngine;
+using Zenject;
 
 namespace Game.Planet_.Camera_
 {
@@ -10,7 +12,7 @@ namespace Game.Planet_.Camera_
 
         #region Serialized Fields
 
-        public Transform planetTransform = null!; // asserted in Awake
+        [Inject] private PlanetMonoBehaviour _planetMono = null!; // asserted in Awake
 
         #endregion
 
@@ -18,15 +20,16 @@ namespace Game.Planet_.Camera_
 
         private void Awake()
         {
-            NullChecker.AssertNoneIsNullInType(GetType(), planetTransform);
+            NullChecker.AssertNoneIsNullInType(GetType(), _planetMono);
         }
 
         private void Update()
         {
+            if (!_planetMono.ReactToUserInput) return;
             var selfTransform = transform;
             var selfPosition = selfTransform.position;
 
-            var zoomSpeed = Mathf.Sqrt(planetTransform.EdgeDistanceFrom(selfTransform) * ZoomSpeedMultiplier);
+            var zoomSpeed = Mathf.Sqrt(_planetMono.transform.EdgeDistanceFrom(selfTransform) * ZoomSpeedMultiplier);
 
             var scrollValue = Input.GetAxis("Mouse ScrollWheel");
 

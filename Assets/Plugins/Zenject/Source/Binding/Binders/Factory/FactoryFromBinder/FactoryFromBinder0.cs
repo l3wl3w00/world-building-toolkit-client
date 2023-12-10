@@ -72,9 +72,11 @@ namespace Zenject
 
             return FromMethod(_ =>
                 {
-                    var res = BindContainer.Resolve<Context>().GetRootGameObjects()
+                    var res = BindContainer.Resolve<Context>()
+                        .GetRootGameObjects()
                         .Select(x => x.GetComponentInChildren<TContract>(includeInactive))
-                        .Where(x => x != null).FirstOrDefault();
+                        .Where(x => x != null)
+                        .FirstOrDefault();
 
                     Assert.IsNotNull(res,
                         "Could not find component '{0}' through FromComponentInHierarchy factory binding", typeof(TContract));

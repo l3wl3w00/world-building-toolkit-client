@@ -19,7 +19,9 @@ namespace Common
     public readonly struct Option<T> : IOption where T : notnull
     {
         private readonly T? _value;
-        
+
+        public bool HasValue { get; }
+
         private Option(T? value, bool hasValue)
         {
             HasValue = hasValue;
@@ -35,9 +37,19 @@ namespace Common
             }
         }
 
-        public bool HasValue { get; }
-
         public bool NoValue => !HasValue;
+
+        public bool NoValueOut(out T? value)
+        {
+            value = this._value;
+            return NoValue;
+        }
+        
+        public bool HasValueOut(out T? value)
+        {
+            value = this._value;
+            return HasValue;
+        }
         public object ValueAsObject => Value;
         public static Option<T> None => new(default, false);
 
@@ -50,6 +62,8 @@ namespace Common
 
         public static Option<T> FromNullable(T? value)
         {
+            T t = value;
+
             if (value == null) return None;
             return Some(value);
         }
@@ -84,19 +98,19 @@ namespace Common
             if (HasValue) action(Value);
             return this;
         }
-        
-        public async Task<Option<T>> DoIfNotNullAsync(Func<T, Task> action)
-        {
-            if (HasValue) await action(Value);
-            return this;
-        }
 
         public Option<T> DoIfNull(Action action)
         {
             if (NoValue) action();
             return this;
         }
-        
+
+        public async Task<Option<T>> DoIfNotNullAsync(Func<T, Task> action)
+        {
+            if (HasValue) await action(Value);
+            return this;
+        }
+
         public Option<T> LogErrorIfNull(string message)
         {
             if (NoValue) Debug.LogError(message);

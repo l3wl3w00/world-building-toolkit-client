@@ -1,10 +1,10 @@
 #nullable enable
 using Common;
 using Common.ButtonBase;
+using Common.Generated;
 using Common.Model;
 using Common.Triggers;
 using Common.Utils;
-using Generated;
 
 namespace UI.MainMenu.Command
 {
@@ -12,7 +12,7 @@ namespace UI.MainMenu.Command
     {
         public override void OnTriggered(NoActionParam param)
         {
-            Scenes.PlanetEditingScene.Load(SceneParamKeys.WorldInitializeParams, Option<PlanetWithRelatedEntities>.None);
+            Scene.PlanetEditingScene.Load(SceneParamKeys.WorldInitializeParams, Option<PlanetWithRelatedEntities>.None);
         }
     }
 }

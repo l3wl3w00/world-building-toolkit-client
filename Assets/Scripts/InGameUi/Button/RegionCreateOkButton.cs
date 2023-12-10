@@ -16,6 +16,7 @@ using Common.Utils;
 using Game.Planet_.Parts.State;
 using GameController.Commands;
 using GameController.Queries;
+using InGameUi.Util;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -49,13 +50,16 @@ namespace InGameUi.Button
             var dropdowns = FindObjectsOfType<TMP_Dropdown>().ToOption().Value;
             var dropdown = dropdowns.Single(t => t.name == "TypeDropdown");
             var builder = _regionBuilderQuery.Get(); 
-            builder.OnFinishedBuilding();
             return MapperMethods.ToCreateRegionDto(
                 builder.ControlPoints, 
                 (RegionType) dropdown.value, 
                 new Color(1f,1f,1f,2f));
         }
 
+        protected override void BeforeRequestIsSent()
+        {
+            _regionBuilderQuery.Get().OnFinishedBuilding();
+        }
         protected override IResponseProcessStrategy<RegionDto> GetResponseProcessStrategy(NoActionParam buttonParams)
             => this;
 
@@ -64,9 +68,6 @@ namespace InGameUi.Button
             _createRegionCommand.OnTriggered(new(responseDto.ToModel()));
         }
 
-        public void OnFail(ErrorResponse error)
-        {
-            
-        }
+        public void OnFail(ErrorResponse error) => error.DisplayToUi();
     }
 }

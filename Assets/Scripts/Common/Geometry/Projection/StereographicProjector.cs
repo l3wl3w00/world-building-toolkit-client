@@ -31,7 +31,14 @@ namespace Common.Geometry.Projection
             var x = cartesianNormalized.x;
             var y = cartesianNormalized.y;
             var z = cartesianNormalized.z;
+            // if (Math.Abs(y - 1f) < 0.0001f)
+            // {
+            //     y = 0.9999f;
+            // }
+            // var result = new Vector2(x / (1f - z), y / (1f - z));
             var result = new Vector2(x / (1f - y), z / (1f - y));
+
+
             // var x = cartesian.x;
             // var y = cartesian.y;
             // var z = cartesian.z;
@@ -47,6 +54,11 @@ namespace Common.Geometry.Projection
             var x = cartesianNormalized.x;
             var y = cartesianNormalized.y;
             var z = cartesianNormalized.z;
+            // if (Math.Abs(y - 1f) < 0.0001f)
+            // {
+            //     y = 0.9999f;
+            // }
+            // var result = new Vector2(x / (100f - z), y / (100f - z));
             var result = new Vector2(x / (1f - y), z / (1f - y));
             return result;
         }

@@ -6,7 +6,6 @@ using Common.Geometry.Projection;
 using Common.Model;
 using UnityEngine;
 using Object = UnityEngine.Object;
-
 namespace Common.Geometry.Sphere
 {
     public interface IPolygonOnSphere: IDisposable
@@ -42,7 +41,7 @@ namespace Common.Geometry.Sphere
 
         public void Dispose()
         {
-            // Object.Destroy(_projection2D.gameObject);
+            Object.Destroy(_projection2D.gameObject);
         }
         
         public bool Contains(Vector3 v1, Vector3 v2, Vector3 v3)

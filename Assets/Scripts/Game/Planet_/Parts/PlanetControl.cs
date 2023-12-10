@@ -27,8 +27,8 @@ namespace Game.Planet_.Parts
             NullChecker.AssertNoneIsNullInType(GetType(), mainCamera, continentPrefab, continentsManager);
 
             SceneChangeParameters
-                .NonNullInstance(GetType())
-                .GetNonNullable(SceneParamKeys.WorldInitializeParams)
+                .SearchInSceneAndExpectFound(GetType())
+                .GetOrLogError(SceneParamKeys.WorldInitializeParams)
                 .DoIfNotNull(i => Planet = i.Planet);
         }
 

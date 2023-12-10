@@ -29,4 +29,13 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Initial.unity
     guid: 9cc6226ecc17a614b84b10266637d673
+  - enabled: 1
+    path: Assets/Scenes/UI/UserLogin.unity
+    guid: cda5727777616874386d975a352a2901
+  - enabled: 1
+    path: Assets/Scenes/UI/EmailLogin.unity
+    guid: 11d49e9666cf97f4081e3463dab357f8
+  - enabled: 1
+    path: Assets/Scenes/UI/RegisterScene.unity
+    guid: a8295907b3c57ef4585a4f23380516e4
   m_configObjects: {}

@@ -14,6 +14,7 @@ namespace Client.Dto
         bool Inverted,
         RegionType RegionType,
         ColorDto Color,
+        List<HistoricalEventDto> Events,
         List<PlanetCoordinateDto> Bounds) : JsonSerializable<RegionDto>;
 
 
@@ -24,4 +25,12 @@ namespace Client.Dto
         ColorDto Color,
         List<PlanetCoordinateDto> Bounds) 
         : JsonSerializable<CreateRegionDto>;
+
+    public record PatchRegionDto(
+            string? Name,
+            string? Description,
+            bool? Inverted,
+            RegionType? RegionType,
+            ColorDto? Color) 
+        : JsonSerializable<PatchRegionDto>;
 }

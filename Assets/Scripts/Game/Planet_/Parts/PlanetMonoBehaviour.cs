@@ -11,6 +11,7 @@ using Game.Planet_.Camera_;
 using Game.Planet_.Parts.State;
 using Game.Region_;
 using ProceduralToolkit;
+using Unity.Plastic.Newtonsoft.Json.Serialization;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -20,7 +21,7 @@ namespace Game.Planet_.Parts
     {
         private Option<PlanetControl> _planetControl = Option<PlanetControl>.None; // asserted in Awake
         private Option<ContinentsManager> _continentsManager = Option<ContinentsManager>.None; // asserted in Awake
-
+        public bool ReactToUserInput { get; set; } = true;
         private PlanetControl PlanetControl => this.LazyInitialize(ref _planetControl);
         private ContinentsManager ContinentsManager => this.LazyInitialize(ref _continentsManager);
         private ContinentTree ContinentTree => ContinentsManager.ContinentTree;
@@ -37,8 +38,8 @@ namespace Game.Planet_.Parts
         private void Start()
         {
             SceneChangeParameters
-                .NonNullInstance(GetType())
-                .GetNonNullable(SceneParamKeys.WorldInitializeParams)
+                .SearchInSceneAndExpectFound(GetType())
+                .GetOrLogError(SceneParamKeys.WorldInitializeParams)
                 .DoIfNotNull(ToEditPlanetStateInitially);
         }
 
@@ -59,9 +60,6 @@ namespace Game.Planet_.Parts
 
         public TResult ApplyStateOperation<TState, TResult>(IContinentStateOperation<TState, TResult> operation)
             where TState : IContinentState => ContinentsManager.ApplyStateOperation(operation);
-        
-        public void ApplyStateOperation<TState>(IContinentStateOperation<TState> operation)
-            where TState : IContinentState => ContinentsManager.ApplyStateOperation(operation);
         public void UpdatePlanetLines() => ContinentsManager.UpdatePlanetLines();
         public void ToEditPlanetState() => ContinentsManager.ToEditPlanetState(this);
         public void StartCreatingNewRegion() => ContinentsManager.StartCreatingNewRegion();
@@ -81,11 +79,13 @@ namespace Game.Planet_.Parts
 
         public void OnMouseDownOverContinent(ContinentMonoBehaviour continentMonoBehaviour)
         {
+            if (!ReactToUserInput) return; 
             ContinentsManager.ClickedOnContinent(continentMonoBehaviour);
         }
 
         public void OnMouseDownOverRegion(RegionMonoBehaviour continentMonoBehaviour)
         {
+            if (!ReactToUserInput) return; 
             ContinentsManager.ClickedOnRegion(continentMonoBehaviour);
         }
 

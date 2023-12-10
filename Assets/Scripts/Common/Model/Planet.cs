@@ -9,6 +9,7 @@ namespace Common.Model
             IdOf<Planet> Id,
             string Name,
             string Description,
+            TimeSpan DayLength,
             Color LandColor,
             Color AntiLandColor) 
         : IModel<Planet>

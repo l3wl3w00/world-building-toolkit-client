@@ -31,7 +31,25 @@ namespace Common.Utils
                 t3.ToObjectInfo(),
                 t4.ToObjectInfo(),
                 t5.ToObjectInfo());
-
+        
+        public static void AssertNoneIsNullInType<T1, T2, T3, T4, T5, T6>(Type type, T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6) => 
+            AssertNoneIsNullInType(type,
+                t1.ToObjectInfo(),
+                t2.ToObjectInfo(),
+                t3.ToObjectInfo(),
+                t4.ToObjectInfo(),
+                t5.ToObjectInfo(),
+                t6.ToObjectInfo());
+        
+        public static void AssertNoneIsNullInType<T1, T2, T3, T4, T5, T6, T7>(Type type, T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6, T7 t7) => 
+            AssertNoneIsNullInType(type,
+                t1.ToObjectInfo(),
+                t2.ToObjectInfo(),
+                t3.ToObjectInfo(),
+                t4.ToObjectInfo(),
+                t5.ToObjectInfo(),
+                t6.ToObjectInfo(),
+                t7.ToObjectInfo());
         
         // private static void AssertNoneIsNullInType(Type type, params object?[] ts)
         // {

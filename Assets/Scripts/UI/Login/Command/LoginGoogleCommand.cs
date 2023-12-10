@@ -1,8 +1,8 @@
 #nullable enable
 using Common.ButtonBase;
+using Common.Generated;
 using Common.Triggers;
 using Common.Utils;
-using Generated;
 using UnityEngine;
 
 namespace UI.Login.Command
@@ -23,7 +23,7 @@ namespace UI.Login.Command
                 "access_type=offline&" +
                 "include_granted_scopes=true";
             Application.OpenURL(url);
-            Scenes.OAuthLoginScreen.Load();
+            Scene.OAuthLoginScreen.Load();
         }
     }
 }

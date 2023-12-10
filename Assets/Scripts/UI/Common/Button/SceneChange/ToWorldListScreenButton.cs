@@ -1,5 +1,5 @@
 #nullable enable
-using Generated;
+using Common.Generated;
 
 namespace UI.Common.Button.SceneChange
 {
@@ -7,7 +7,7 @@ namespace UI.Common.Button.SceneChange
 
     public class ToWorldListScreenCommand : SceneChangeCommand
     {
-        protected override Scenes Scene => Scenes.WorldListScreen;
+        protected override Scene Scene => Scene.WorldListScreen;
 
     }
 }

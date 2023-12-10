@@ -18,7 +18,7 @@ namespace Common
             return AppDomain.CurrentDomain.GetAssemblies()
                 .SelectMany(assembly => assembly.GetTypes())
                 .Where(t => typeof(IActionListener).IsAssignableFrom(t) || typeof(IQuery).IsAssignableFrom(t))
-                .Where(t => t.IsClass && !t.IsAbstract && !t.IsGenericType)
+                .Where(t => t is { IsClass: true, IsAbstract: false, IsGenericType: false })
                 .Where(t => namespaces.Any(n => t.Namespace.StartsWith(n)));
 
         }

@@ -9,7 +9,7 @@ using Common.Constants;
 using Common.Model;
 using Common.Model.Abstractions;
 using Common.Utils;
-using Generated;
+using InGameUi.Util;
 using UnityEngine;
 using UnityEngine.Serialization;
 using Zenject;
@@ -58,7 +58,7 @@ namespace UI.WorldList
 
             public void OnFail(ErrorResponse error)
             {
-                
+                error.DisplayToUi();
             }
         }
     }

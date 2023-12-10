@@ -55,8 +55,43 @@ namespace Game.Planet_.Parts
             }
         }
 
-        
+        internal void UpdatePlanetMeshColliders(MeshDraft planetDraft)
+        {
+            var sortedContinentsWithPolygons = GenerateVertices(planetDraft, out var regions);
+            
+            foreach (var info in sortedContinentsWithPolygons)
+            {
+                info.PolygonOnSphere.Dispose();
+                info.MonoBehaviour.UpdateMeshCollider(info.Draft);
+            }
+            
+            foreach (var region in regions)
+            {
+                region.PolygonOnSphere.Dispose();
+                region.MonoBehaviour.UpdateMeshCollider(region.Draft);
+                region.MonoBehaviour.transform.localScale *= 1.0035f;
+            }
+        }
+                
         internal void UpdatePlanetMeshes(MeshDraft planetDraft)
+        {
+            var sortedContinentsWithPolygons = GenerateVertices(planetDraft, out var regions);
+
+            foreach (var info in sortedContinentsWithPolygons)
+            {
+                info.PolygonOnSphere.Dispose();
+                info.MonoBehaviour.UpdateMesh(info.Draft, info.Depth);
+            }
+            
+            foreach (var region in regions)
+            {
+                region.PolygonOnSphere.Dispose();
+                region.MonoBehaviour.UpdateMesh(region.Draft);
+                region.MonoBehaviour.transform.localScale *= 1.0035f;
+            }
+        }
+
+        private ContinentInfoForMeshUpdate[] GenerateVertices(MeshDraft planetDraft, out RegionInfoForMeshUpdate[] regions)
         {
             var sortedContinentsWithPolygons = _root
                 .PostOrderTraversal()
@@ -65,7 +100,7 @@ namespace Game.Planet_.Parts
             var lastIndex = sortedContinentsWithPolygons.Length - 1;
             sortedContinentsWithPolygons[lastIndex] = new ContinentInfoForMeshUpdate(_root.MonoBehaviour, 0, true);
 
-            var regions = Object
+            regions = Object
                 .FindObjectsOfType<RegionMonoBehaviour>()
                 .Select(r => new RegionInfoForMeshUpdate(r))
                 .ToArray();
@@ -80,10 +115,9 @@ namespace Game.Planet_.Parts
                 var v2 = planetDraft.vertices[v2Index];
                 var v3 = planetDraft.vertices[v3Index];
                 var vertices = (v1, v2, v3);
-                
+
                 foreach (var info in sortedContinentsWithPolygons)
                 {
-
                     bool polygonContains;
                     unsafe
                     {
@@ -108,26 +142,15 @@ namespace Game.Planet_.Parts
                             ? !region.PolygonOnSphere.ContainsUnsafe(&vertices)
                             : region.PolygonOnSphere.ContainsUnsafe(&vertices);
                     }
+
                     if (polygonContains)
                     {
                         region.Draft.AddTriangle(v1, v2, v3, true);
                     }
                 }
-                // Debug.LogError($"None of the continents contains the triangle {i}, {i + 1}, {i + 2}");
             }
-            
-            foreach (var info in sortedContinentsWithPolygons)
-            {
-                info.PolygonOnSphere.Dispose();
-                info.MonoBehaviour.UpdateMesh(info.Draft, info.Depth);
-            }
-            
-            foreach (var region in regions)
-            {
-                region.PolygonOnSphere.Dispose();
-                region.MonoBehaviour.UpdateMesh(region.Draft);
-                region.MonoBehaviour.transform.localScale *= 1.0035f;
-            }
+
+            return sortedContinentsWithPolygons;
         }
 
         internal ContinentMonoBehaviour CreateContinentWithParent(ContinentWithParent continent, ISphere sphere, IContinentClickedListener clickedListener)

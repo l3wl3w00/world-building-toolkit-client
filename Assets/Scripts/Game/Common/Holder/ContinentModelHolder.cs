@@ -1,5 +1,5 @@
 using Common.Model;
 namespace Game.Common.Holder
 {
-	public class ContinentModelHolder : ModelHolder<Continent> { }
+		public class ContinentModelHolder : ModelHolder<Continent> 	{ }
 }

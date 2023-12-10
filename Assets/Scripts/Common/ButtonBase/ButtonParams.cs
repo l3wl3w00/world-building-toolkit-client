@@ -26,4 +26,10 @@ namespace Common.ButtonBase
             return new ColorPickerActionParam(color);
         }
     }
+
+    public static class ActionParamUtils
+    {
+        public static SingleActionParam<T> ToActionParam<T>(this SingleActionParam<T> actionParam) => actionParam;
+        public static SingleActionParam<T> ToActionParam<T>(this T t) => new(t);
+    }
 }

@@ -19,6 +19,7 @@ using Common.Utils;
 using Game.Planet_.Parts.State;
 using GameController.Commands;
 using GameController.Queries;
+using InGameUi.Util;
 using UnityEngine;
 using UnityEngine.PlayerLoop;
 using Zenject;
@@ -49,7 +50,10 @@ namespace InGameUi.Button
 
         protected override CreateContinentDto GetRequestDto(NoActionParam buttonParams) => 
             MapperMethods.ToCreateContinentDto(_builderQuery.Get().ControlPoints, _builderQuery.Get().ParentId);
-
+        protected override void BeforeRequestIsSent()
+        {
+            _builderQuery.Get().OnFinishedBuilding();
+        }
         protected override IResponseProcessStrategy<ContinentDto> GetResponseProcessStrategy(NoActionParam buttonParams) => this;
 
 
@@ -59,9 +63,6 @@ namespace InGameUi.Button
             _createContinentWithParentCommand.OnTriggered(new(continent));
         }
 
-        public void OnFail(ErrorResponse error)
-        {
-            
-        }
+        public void OnFail(ErrorResponse error) => error.DisplayToUi();
     }
 }

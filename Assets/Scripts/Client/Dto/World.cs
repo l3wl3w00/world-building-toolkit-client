@@ -7,7 +7,7 @@ namespace Client.Dto
 {
     public record WorldSummaryDtos(List<WorldSummaryDto> value) : JsonSerializable<WorldSummaryDtos>;
     public record WorldSummaryDto(Guid Id, string Name) : JsonSerializable<WorldSummaryDto>;
-    public record CreateWorldDto(string Name, string Description, ColorDto LandColor, ColorDto AntiLandColor)
+    public record CreateWorldDto(string Name, string Description, ColorDto LandColor, ColorDto AntiLandColor, TimeSpan DayLength, uint NumberOfDaysInYear)
         : JsonSerializable<CreateWorldDto>;
 
     public record PatchWorldDto : JsonSerializable<PatchWorldDto>
@@ -17,16 +17,16 @@ namespace Client.Dto
         public ColorDto? LandColor { get; init;}
         public ColorDto? AntiLandColor { get; init;}
     }
+
     public record WorldDetailedDto(
-        Guid Id,
-        string Name,
-        string Description,
-        ColorDto LandColor,
-        ColorDto AntiLandColor,
-        List<ContinentDto> Continents,
-        List<CalendarDto> Calendars
+            Guid Id,
+            string Name,
+            string Description,
+            TimeSpan DayLength,
+            ColorDto LandColor,
+            ColorDto AntiLandColor,
+            List<ContinentDto> Continents,
+            List<CalendarDto> Calendars
         )
-        : JsonSerializable<WorldDetailedDto>
-    {
-    }
+        : JsonSerializable<WorldDetailedDto>;
 }

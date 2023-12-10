@@ -1,5 +1,7 @@
 ﻿#nullable enable
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using Common;
 using Common.Model;
 using Common.Utils;
@@ -7,18 +9,22 @@ using Game.Common;
 using Game.Continent_;
 using Game.Planet_.Parts.State;
 using Game.Region_;
+using UnityEditor.PackageManager;
 using UnityEngine;
 using UnityEngine.Events;
-using Action = Unity.Plastic.Antlr3.Runtime.Misc.Action;
+using Zenject;
 
 namespace Game.Planet_.Parts
 {
     internal class ContinentsManager : MonoBehaviour
     {
         private Option<ContinentTree> _continentTree = Option<ContinentTree>.None;
-        private IContinentState _continentState = new CreatePlanetState();
+        private IContinentState _continentState = new PlanetInCreationState();
         [SerializeField] private PlanetControl planetControl = null!; //Asserted in Awake
-
+        [Inject] private ModelCollection<Calendar> _calendars = null!; //Asserted in Awake
+        [Inject] private ModelCollection<HistoricalEvent> _events = null!; //Asserted in Awake
+        [Inject] private ModelCollection<Region> _regions = null!; //Asserted in Awake
+        [Inject] private SignalBus _signalBus = null!; //Asserted in Awake
         private IEnumerable<ContinentMonoBehaviour> Continents => ContinentTree.Continents;
 
         private IContinentState ContinentState
@@ -40,7 +46,7 @@ namespace Game.Planet_.Parts
 
         private void Awake()
         {
-            NullChecker.AssertNoneIsNullInType(GetType(), planetControl);
+            NullChecker.AssertNoneIsNullInType(GetType(), planetControl, _calendars, _signalBus);
         }
         
         internal void SetContinentState(IContinentState continentState)
@@ -93,9 +99,6 @@ namespace Game.Planet_.Parts
         {
             return ContinentState.Interact(operation);
         }
-        
-        internal void ApplyStateOperation<TState>(IContinentStateOperation<TState> operation) where TState: IContinentState =>
-            ContinentState.Interact(operation);
 
         internal void UpdatePlanetLines()
         {
@@ -131,21 +134,25 @@ namespace Game.Planet_.Parts
             {
                 foreach (var region in continent.Regions)
                 {
-                    RegionMonoBehaviour.Create(new(planetMono, region, planetMono));
+                    var regionRef = _regions.Add(region);
+                    RegionMonoBehaviour.Create(new(planetMono, regionRef, planetMono));
                 }
             }
-            
+
+            _calendars.Add(worldInitParams.Calendars);
+            _events.Add(worldInitParams.Events);
             UpdatePlanetMeshes();
             _continentState = new EditPlanetState(planetMono);
             _continentState.OnStart();
+            _signalBus.Fire<StateChangedSignal>();
         }
 
         internal void UpdatePlanetMeshes()
         {
             UpdatePlanetLines();
-            _continentTree
-                .ExpectNotNull(nameof(_continentTree), (Action) UpdatePlanetMeshes)
-                .UpdatePlanetMeshes(planetControl.CreateSphereMeshDraft(300,300));
+            var continentTree = _continentTree.ExpectNotNull(nameof(_continentTree), (Action) UpdatePlanetMeshes);
+            continentTree.UpdatePlanetMeshes(planetControl.CreateSphereMeshDraft(700,700));
+            continentTree.UpdatePlanetMeshColliders(planetControl.CreateSphereMeshDraft(100,100));
         }
     }
 }

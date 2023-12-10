@@ -1,5 +1,6 @@
 #nullable enable
 using System.Collections.Generic;
+using Common.Generated;
 using Common.Geometry.Sphere;
 using Common.Model;
 using Common.Model.Abstractions;
@@ -19,7 +20,7 @@ namespace Game.Region_
 
         public record CreateParams(IdOf<Continent> continentId, ISphere sphere, IRegionClickedListener clickedListener) : CreateParamsFlag;
 
-        private record RegionBuilder() : PrefabProvider(Generated.Prefab.RegionBuilder);
+        private record RegionBuilder() : PrefabProvider(Prefab.RegionBuilder);
 
         public static RegionMonoBuilder Create(CreateParams p) =>
             IGameObjectFactoryMethod<CreateParams, RegionBuilder, RegionMonoBuilder>.Create(p, p.sphere.Transform);
@@ -46,10 +47,10 @@ namespace Game.Region_
             SphereLineRendererHandler.UpdateLineRenderer();
         }
 
-        public RegionMonoBehaviour Build(Region region)
+        public RegionMonoBehaviour Build(Ref<Region> region)
         {
             OnFinishedBuilding();
-            return RegionMonoBehaviour.Create(new(Sphere, region, ClickedListener));
+            return RegionMonoBehaviour.Create(new(Sphere, region ,ClickedListener));
         }
 
         public void OnFinishedBuilding()

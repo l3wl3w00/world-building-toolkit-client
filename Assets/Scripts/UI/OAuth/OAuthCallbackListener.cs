@@ -5,8 +5,8 @@ using System.Threading.Tasks;
 using CodiceApp.EventTracking.Plastic;
 using Common;
 using Common.Constants;
+using Common.Generated;
 using Common.Utils;
-using Generated;
 using UnityEngine;
 
 namespace UI.OAuth
@@ -80,7 +80,7 @@ namespace UI.OAuth
                         PlayerPrefs.SetString(AuthConstants.GoogleTokenSaveDateKey,
                             _timeProvider.Now.ToBinary().ToString());
                         PlayerPrefs.Save();
-                        Scenes.MainMenuScreen.Load();
+                        Scene.MainMenuScreen.Load();
                     });
             }
         }

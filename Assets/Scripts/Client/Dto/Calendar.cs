@@ -6,9 +6,9 @@ using Common.Model;
 namespace Client.Dto
 {
     public record CalendarDtos(List<CalendarDto> Value) : JsonSerializable<CalendarDto>;
-    public record CalendarDto(Guid Id, string Name, string Description, uint FirstYear, Guid PlanetId, List<YearPhase> YearPhases)
+    public record CalendarDto(Guid Id, string Name, string Description, ulong FirstYear, Guid PlanetId, List<YearPhase> YearPhases)
         : JsonSerializable<CalendarDto>;
     
-    public record CreateCalendarDto(string Name, string Description, uint FirstYear, List<YearPhase> YearPhases) 
+    public record CreateCalendarDto(string Name, string Description, ulong FirstYear, List<YearPhase> YearPhases) 
         : JsonSerializable<CreateCalendarDto>;
 }

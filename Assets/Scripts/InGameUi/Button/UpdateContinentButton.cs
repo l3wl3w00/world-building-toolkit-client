@@ -8,82 +8,31 @@ using Client.Request;
 using Client.Response;
 using Common;
 using Common.ButtonBase;
+using Common.Triggers;
+using Common.Utils;
+using Game;
 using GameController.Commands;
 using GameController.Queries;
+using InGameUi.Util;
 using TMPro;
 using UnityEngine.UI;
 using Zenject;
 
 namespace InGameUi.Button
 {
+    public class UpdateContinentButton : ButtonActionTrigger<UpdateContinentCommand> { }
+
     public class UpdateContinentCommand : ApiCallingCommand<NoActionParam, PatchContinentDto, ContinentDto>, IResponseProcessStrategy<ContinentDto>
-        // HudButtonControl<NoActionParam>, IContinentStateOperation<SelectedContinentState, Unit>
     {
-        [Inject] private SelectedContinentQuery _selectedContinentQuery;
-        [Inject] private UpdateSelectedContinentModelCommand _continentModelCommand;
-        // private Option<WorldBuildingApiClient> _client = Option<WorldBuildingApiClient>.None;
-        //
-        // protected override void OnStart()
-        // {
-        //     base.OnStart();
-        //     _client = new WorldBuildingApiClient(PlayerPrefs.GetString(AuthConstants.GoogleTokenKey));
-        // }
-        //
-        // protected override void OnClickedTypesafe(NoActionParam param)
-        // {
-        //     PlanetMono.ApplyStateOperation(this);
-        // }
-        //
-        // public Unit Apply(SelectedContinentState state)
-        // {
-        //     var texts = FindObjectsOfType<TextMeshProUGUI>().ToOption().Value;
-        //     var nameInput = texts.Single(t => t.name == "NameInput");
-        //     var descriptionInput = texts.Single(t => t.name == "DescriptionInput");
-        //     
-        //     var invertToggle = FindObjectsOfType<Toggle>().Single(t => t.name == "Inverted");
-        //     var continentName = nameInput.text.Replace("\u200b", "");
-        //     var continentDescription = descriptionInput.text.Replace("\u200b", "");
-        //     
-        //     var inverted = invertToggle.isOn;
-        //
-        //     var dto = new PatchContinentDto(continentName, continentDescription, inverted);
-        //     
-        //     _client
-        //         .ExpectNotNull(nameof(_client), (Func<SelectedContinentState,Unit>)Apply)
-        //         .PatchContinent(
-        //             state.SelectedContinent.Continent.Id,
-        //             dto,
-        //             new ContinentUpdateResponseProcessor(state.SelectedContinent))
-        //         .StartCoroutine(this);
-        //     return new Unit();
-        // }
-        //
-        // public Unit OnStateNotT(IContinentState state)
-        // {
-        //     Debug.LogError("No continent was selected when trying to update continent");
-        //     return new Unit();
-        // }
-        //
-        // private void OnContinentPatchSuccessful(ContinentDto newContinentDto,
-        //     ContinentMonoBehaviour selectedContinent)
-        // {
-        //
-        // }
-        //
-        // private record ContinentUpdateResponseProcessor(ContinentMonoBehaviour selectedContinent) 
-        //     : IResponseProcessStrategy<ContinentDto>
-        // {
-        //     public void OnSuccess(ContinentDto responseDto)
-        //     {
-        //         selectedContinent.Continent = responseDto.ToModel();
-        //         Debug.Log("Successful update!");
-        //     }
-        //
-        //     public void OnFail(ErrorResponse error)
-        //     {
-        //         
-        //     }
-        // }
+        [Inject] private SelectedContinentQuery _selectedContinentQuery = null!; // Asserted in OnStart
+        [Inject] private UpdateSelectedContinentModelCommand _continentModelCommand = null!; // Asserted in OnStart
+        [Inject] private SignalBus _signalBus = null!; // Asserted in OnStart
+
+        protected override void OnStart()
+        {
+            NullChecker.AssertNoneIsNullInType(GetType(), _selectedContinentQuery, _continentModelCommand, _signalBus);
+        }
+
         protected override WorldBuildingApiEndpoint GetEndpoint(EndpointFactory endpointFactory, NoActionParam buttonParams) =>
             endpointFactory.PatchContinent(_selectedContinentQuery.Get().Id);
 
@@ -106,13 +55,13 @@ namespace InGameUi.Button
         protected override IResponseProcessStrategy<ContinentDto> GetResponseProcessStrategy(NoActionParam buttonParams) 
             => this;
 
-        public void OnSuccess(ContinentDto responseDto) => 
-            _continentModelCommand.OnTriggered(new(responseDto.ToModel()));
-
-        public void OnFail(ErrorResponse error)
+        public void OnSuccess(ContinentDto responseDto)
         {
-            
+            _continentModelCommand.OnTriggered(new(responseDto.ToModel()));
+            _signalBus.StateChanged();
         }
+
+        public void OnFail(ErrorResponse error) => error.DisplayToUi();
     }
 
     public class IsExternalInit { }
